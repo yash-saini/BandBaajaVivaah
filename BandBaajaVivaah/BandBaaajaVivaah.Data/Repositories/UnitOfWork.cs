@@ -20,10 +20,12 @@ namespace BandBaaajaVivaah.Data.Repositories
             Expenses = new Repository<Expense>(context);
             Tasks = new Repository<Task>(context);
         }
+
         public async Task<int> CompleteAsync()
         {
             return await _context.SaveChangesAsync();
         }
+
         public void Dispose()
         {
             _context.Dispose();
