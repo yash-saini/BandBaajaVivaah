@@ -19,6 +19,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 // You can keep the IUserService registration as is, 
 // or register all your repositories and services here.
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IWeddingService, WeddingService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
