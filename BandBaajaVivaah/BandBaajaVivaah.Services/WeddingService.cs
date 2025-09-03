@@ -22,6 +22,7 @@ namespace BandBaajaVivaah.Services
         {
             return await _unitOfWork.Weddings.GetByIdAsync(weddingId);
         }
+
         public async Task<Wedding> CreateWeddingAsync(Wedding newWedding)
         {
             await _unitOfWork.Weddings.AddAsync(newWedding);
