@@ -1,9 +1,11 @@
 ﻿using BandBaaajaVivaah.Data.Models;
 using BandBaajaVivaah.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BandBaajaVivaah.WebAPI.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase
@@ -24,17 +26,6 @@ namespace BandBaajaVivaah.WebAPI.Controllers
                 return NotFound();
             }
             return Ok(user);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> CreateUser([FromBody] User newUser)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            var createdUser = await _userService.CreateUserAsync(newUser);
-            return CreatedAtAction(nameof(GetUserById), new { id = createdUser.UserId }, createdUser);
         }
     }
 }

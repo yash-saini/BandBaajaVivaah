@@ -1,17 +1,13 @@
 ﻿using BandBaaajaVivaah.Data.Models;
 using BandBaaajaVivaah.Data.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using BandBaajaVivaah.Contracts.DTO;
 
 namespace BandBaajaVivaah.Services
 {
     public interface IUserService
     {
-        Task<User?> GetUserByIdAsync(int userId);
-        Task<User> CreateUserAsync(User newUser);
+        Task<UserDto?> GetUserByIdAsync(int userId);
+        Task<User> RegisterUserAsync(string fullName, string email, string password);
     }
 
     public class UserService : IUserService
@@ -24,15 +20,36 @@ namespace BandBaajaVivaah.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<User?> GetUserByIdAsync(int userId)
+        public async Task<UserDto?> GetUserByIdAsync(int userId)
         {
-            return await _unitOfWork.Users.GetByIdAsync(userId);
+            var user = await _unitOfWork.Users.GetByIdAsync(userId);
+            if (user == null)
+            {
+                return null;
+            }
+
+            return new UserDto
+            {
+                UserID = user.UserId,
+                FullName = user.FullName,
+                Email = user.Email,
+                Role = user.Role
+            };
         }
 
-        public async Task<User> CreateUserAsync(User newUser)
+        public async Task<User> RegisterUserAsync(string fullName, string email, string password)
         {
+            var passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
+
+            var newUser = new User
+            {
+                FullName = fullName,
+                Email = email,
+                PasswordHash = passwordHash,
+                Role = "User"
+            };
             await _unitOfWork.Users.AddAsync(newUser);
-            await _unitOfWork.CompleteAsync(); // Save changes
+            await _unitOfWork.CompleteAsync();
             return newUser;
         }
     }

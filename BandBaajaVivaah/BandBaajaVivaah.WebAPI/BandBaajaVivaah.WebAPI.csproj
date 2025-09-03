@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BandBaajaVivaah.Contracts\BandBaajaVivaah.Contracts.csproj" />
     <ProjectReference Include="..\BandBaajaVivaah.Services\BandBaajaVivaah.Services.csproj" />
   </ItemGroup>
 

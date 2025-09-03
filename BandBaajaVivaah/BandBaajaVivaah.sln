@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BandBaaajaVivaah.Data", "Ba
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BandBaajaVivaah.Services", "BandBaajaVivaah.Services\BandBaajaVivaah.Services.csproj", "{5112A098-B949-4D85-A9BC-EB308EE78C16}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BandBaajaVivaah.Contracts", "BandBaajaVivaah.Contracts\BandBaajaVivaah.Contracts.csproj", "{CFC66D60-F78E-4289-9C1F-E62A374557D5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{5112A098-B949-4D85-A9BC-EB308EE78C16}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5112A098-B949-4D85-A9BC-EB308EE78C16}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5112A098-B949-4D85-A9BC-EB308EE78C16}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFC66D60-F78E-4289-9C1F-E62A374557D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFC66D60-F78E-4289-9C1F-E62A374557D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFC66D60-F78E-4289-9C1F-E62A374557D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFC66D60-F78E-4289-9C1F-E62A374557D5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
