@@ -1,6 +1,5 @@
-﻿using BandBaajaVivaah.Services;
-using BandBaajaVivaah.WebAPI.Models;
-using Microsoft.AspNetCore.Http;
+﻿using BandBaajaVivaah.Contracts.DTO;
+using BandBaajaVivaah.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BandBaajaVivaah.WebAPI.Controllers
@@ -30,6 +29,17 @@ namespace BandBaajaVivaah.WebAPI.Controllers
             // We don't return the full user object, especially the password hash
             // For now, returning a simple Ok is fine.
             return Ok(new { Message = "User registered successfully" });
+        }
+
+        [HttpPost("login")] // POST: api/auth/login
+        public async Task<IActionResult> Login([FromBody] UserLoginDto loginDto)
+        {
+            var token = await _userService.LoginAsync(loginDto.Email, loginDto.Password);
+            if (token == null)
+            {
+                return Unauthorized(new { Message = "Invalid email or password" });
+            }
+            return Ok(new { Token = token });
         }
     }
 }
