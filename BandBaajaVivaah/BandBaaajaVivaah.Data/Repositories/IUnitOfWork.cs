@@ -5,7 +5,7 @@ namespace BandBaaajaVivaah.Data.Repositories
 {
     public interface IUnitOfWork : IDisposable
     {
-        IRepository<User> Users { get; }
+        IUserRepository Users { get; }
         IRepository<Wedding> Weddings { get; }
         IRepository<Guest> Guests { get; }
         IRepository<Expense> Expenses { get; }
