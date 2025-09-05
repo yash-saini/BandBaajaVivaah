@@ -8,7 +8,7 @@ namespace BandBaajaVivaah.Services
     {
         Task<UserDto?> GetUserByIdAsync(int userId);
         Task<User> RegisterUserAsync(string fullName, string email, string password);
-        Task<string?> LoginAsync(string email, string password);
+        Task<User?> LoginAsync(string email, string password);
     }
 
     public class UserService : IUserService
@@ -54,15 +54,14 @@ namespace BandBaajaVivaah.Services
             return newUser;
         }
 
-        public async Task<string?> LoginAsync(string email, string password)
+        public async Task<User?> LoginAsync(string email, string password)
         {
             var user = await _unitOfWork.Users.GetByEmailAsync(email);
             if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
             {
                 return null; // Invalid credentials
             }
-            // In a real application, generate a JWT or session token here
-            return "dummy-token"; // Placeholder token
+            return user;
         }
     }
 }
