@@ -1,42 +1,68 @@
-﻿using BandBaaajaVivaah.Data.Models;
+﻿using BandBaajaVivaah.Contracts.DTOs;
 using BandBaajaVivaah.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
-namespace BandBaajaVivaah.WebAPI.Controllers
+namespace BandBaajaVivaah.Api.Controllers
 {
+
+    [Authorize] // Protects all endpoints in this controller
     [Route("api/[controller]")]
     [ApiController]
-    public class WeddingController : ControllerBase
+    public class WeddingsController : ControllerBase
     {
         private readonly IWeddingService _weddingService;
 
-        public WeddingController(IWeddingService weddingService)
+        public WeddingsController(IWeddingService weddingService)
         {
             _weddingService = weddingService;
         }
 
+        // Helper method to get the logged-in user's ID from their token
+        private int GetCurrentUserId()
+        {
+            var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            // This should not fail if the [Authorize] attribute is working correctly
+            return int.Parse(userIdValue);
+        }
+
+        // GET: api/weddings
+        // Gets all weddings for the currently logged-in user
+        [HttpGet]
+        public async Task<IActionResult> GetMyWeddings()
+        {
+            var userId = GetCurrentUserId();
+            var weddings = await _weddingService.GetWeddingsForUserAsync(userId);
+            return Ok(weddings);
+        }
+
         // GET: api/weddings/5
+        // Gets a specific wedding by its ID, but only if it belongs to the logged-in user
         [HttpGet("{id}")]
         public async Task<IActionResult> GetWeddingById(int id)
         {
-            var wedding = await _weddingService.GetWeddingByIdAsync(id);
+            var userId = GetCurrentUserId();
+            var wedding = await _weddingService.GetWeddingByIdAsync(id, userId);
+
             if (wedding == null)
             {
+                // Returns 404 Not Found if the wedding doesn't exist OR the user doesn't own it
                 return NotFound();
             }
+
             return Ok(wedding);
         }
 
         // POST: api/weddings
+        // Creates a new wedding and assigns it to the currently logged-in user
         [HttpPost]
-        public async Task<IActionResult> CreateWedding([FromBody] Wedding newWedding)
+        public async Task<IActionResult> CreateWedding([FromBody] CreateWeddingDto weddingDto)
         {
-            if (!ModelState.IsValid || newWedding == null)
-            {
-                return BadRequest(ModelState);
-            }
-            var createdWedding = await _weddingService.CreateWeddingAsync(newWedding);
-            return CreatedAtAction(nameof(GetWeddingById), new { id = createdWedding.WeddingId }, createdWedding);
+            var userId = GetCurrentUserId();
+            var createdWedding = await _weddingService.CreateWeddingAsync(weddingDto, userId);
+
+            return CreatedAtAction(nameof(GetWeddingById), new { id = createdWedding.WeddingID }, createdWedding);
         }
     }
 }
