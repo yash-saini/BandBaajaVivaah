@@ -7,18 +7,18 @@ namespace BandBaaajaVivaah.Data.Repositories
     {
         private readonly BandBaajaVivaahDbContext _context;
         public IUserRepository Users  { get; private set; }
-        public IRepository<Wedding> Weddings { get; private set; }
+        public IWeddingRepository Weddings { get; private set; }
         public IRepository<Guest> Guests { get; private set; }
         public IRepository<Expense> Expenses { get; private set; }
-        public IRepository<Task> Tasks { get; private set; }
+        public ITaskRepository Tasks { get; private set; }
         public UnitOfWork(BandBaajaVivaahDbContext context)
         {
             _context = context;
             Users = new UserRepository(context);
-            Weddings = new Repository<Wedding>(context);
+            Weddings = new WeddingRepository(context);
             Guests = new Repository<Guest>(context);
             Expenses = new Repository<Expense>(context);
-            Tasks = new Repository<Task>(context);
+            Tasks = new TaskRepository(context);
         }
 
         public async Task<int> CompleteAsync()
