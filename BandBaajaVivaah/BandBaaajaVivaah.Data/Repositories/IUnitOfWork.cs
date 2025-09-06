@@ -6,7 +6,7 @@ namespace BandBaaajaVivaah.Data.Repositories
     {
         IUserRepository Users { get; }
         IWeddingRepository Weddings { get; }
-        IRepository<Guest> Guests { get; }
+        IGuestRepository Guests { get; }
         IRepository<Expense> Expenses { get; }
         ITaskRepository Tasks { get; }
         Task<int> CompleteAsync();
