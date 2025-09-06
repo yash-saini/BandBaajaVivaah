@@ -6,7 +6,6 @@ using System.Security.Claims;
 
 namespace BandBaajaVivaah.Api.Controllers
 {
-
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
