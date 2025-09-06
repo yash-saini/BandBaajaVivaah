@@ -19,8 +19,15 @@ namespace BandBaajaVivaah.Api.Controllers
             _guestService = guestService;
         }
 
-        private int GetCurrentUserId() =>
-            int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+        private int GetCurrentUserId()
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                throw new InvalidOperationException("User ID claim is missing.");
+            }
+            return int.Parse(userIdClaim);
+        }
 
         [HttpGet("wedding/{weddingId}")]
         public async Task<IActionResult> GetGuestsForWedding(int weddingId)
