@@ -7,7 +7,7 @@ namespace BandBaaajaVivaah.Data.Repositories
         IUserRepository Users { get; }
         IWeddingRepository Weddings { get; }
         IGuestRepository Guests { get; }
-        IRepository<Expense> Expenses { get; }
+        IExpenseRepository Expenses { get; }
         ITaskRepository Tasks { get; }
         Task<int> CompleteAsync();
     }
