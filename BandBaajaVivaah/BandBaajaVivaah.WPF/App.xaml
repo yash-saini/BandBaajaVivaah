@@ -4,6 +4,13 @@
              xmlns:local="clr-namespace:BandBaajaVivaah.WPF"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/Styles/Common/Controls.Colors.xaml"/>
+                <ResourceDictionary Source="Resources/Styles/Common/Controls.Button.xaml"/>
+                <ResourceDictionary Source="Resources/Styles/Common/Controls.TextBox.xaml"/>
+                <ResourceDictionary Source="Resources/Styles/Common/Controls.Label.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>
