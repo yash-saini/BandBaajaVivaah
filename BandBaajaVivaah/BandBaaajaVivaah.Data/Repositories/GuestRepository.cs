@@ -13,6 +13,7 @@ namespace BandBaaajaVivaah.Data.Repositories
         public GuestRepository(BandBaajaVivaahDbContext context) : base(context)
         {
         }
+
         public async Task<IEnumerable<Guest>> FindAllAsync(Expression<Func<Guest, bool>> predicate)
         {
             return await System.Threading.Tasks.Task.FromResult(_context.Guests.Where(predicate).ToList());

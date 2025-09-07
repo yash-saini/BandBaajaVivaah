@@ -8,7 +8,7 @@ namespace BandBaaajaVivaah.Data.Repositories
         public IUserRepository Users  { get; private set; }
         public IWeddingRepository Weddings { get; private set; }
         public IGuestRepository Guests { get; private set; }
-        public IRepository<Expense> Expenses { get; private set; }
+        public IExpenseRepository Expenses { get; private set; }
         public ITaskRepository Tasks { get; private set; }
         public UnitOfWork(BandBaajaVivaahDbContext context)
         {
@@ -16,7 +16,7 @@ namespace BandBaaajaVivaah.Data.Repositories
             Users = new UserRepository(context);
             Weddings = new WeddingRepository(context);
             Guests = new GuestRepository(context);
-            Expenses = new Repository<Expense>(context);
+            Expenses = new ExpenseRepository(context);
             Tasks = new TaskRepository(context);
         }
 
