@@ -8,7 +8,6 @@ namespace BandBaajaVivaah.WPF.Views
     /// </summary>
     public partial class LoginView : Window
     {
-        private readonly LoginViewModel _viewModel;
         public LoginView()
         {
             InitializeComponent();
