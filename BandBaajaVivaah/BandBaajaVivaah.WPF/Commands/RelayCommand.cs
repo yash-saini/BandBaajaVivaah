@@ -6,7 +6,7 @@ namespace BandBaajaVivaah.WPF.Commands
     {
         private readonly Action<object?>? _execute;
         private readonly Func<object, Task> _executeAsync;
-        private readonly Predicate<object?> _canExecute;
+        private readonly Predicate<object?>? _canExecute;
         private bool _isExecuting;
 
         public RelayCommand(Func<object, Task> executeAsync, Predicate<object?> canExecute = null)

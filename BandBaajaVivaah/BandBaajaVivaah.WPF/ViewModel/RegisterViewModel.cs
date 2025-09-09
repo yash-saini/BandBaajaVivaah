@@ -2,11 +2,6 @@
 using BandBaajaVivaah.WPF.Commands;
 using BandBaajaVivaah.WPF.Services;
 using BandBaajaVivaah.WPF.ViewModel.Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace BandBaajaVivaah.WPF.ViewModel
@@ -21,7 +16,6 @@ namespace BandBaajaVivaah.WPF.ViewModel
             {
                 _email = value;
                 OnPropertyChanged(nameof(Email));
-                CommandManager.InvalidateRequerySuggested();
             }
         }
 
@@ -33,7 +27,6 @@ namespace BandBaajaVivaah.WPF.ViewModel
             {
                 _password = value;
                 OnPropertyChanged(nameof(Password));
-                CommandManager.InvalidateRequerySuggested();
             }
         }
 
@@ -45,7 +38,6 @@ namespace BandBaajaVivaah.WPF.ViewModel
             {
                 _fullname = value;
                 OnPropertyChanged(nameof(FullName));
-                CommandManager.InvalidateRequerySuggested();
             }
         }
 

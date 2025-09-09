@@ -17,7 +17,6 @@ namespace BandBaajaVivaah.WPF.ViewModel
             {
                 _email = value;
                 OnPropertyChanged(nameof(Email));
-                CommandManager.InvalidateRequerySuggested();
             }
         }
 
@@ -29,7 +28,6 @@ namespace BandBaajaVivaah.WPF.ViewModel
             {
                 _password = value;
                 OnPropertyChanged(nameof(Password));
-                CommandManager.InvalidateRequerySuggested();
             }
         }
 
@@ -67,7 +65,6 @@ namespace BandBaajaVivaah.WPF.ViewModel
             RegisterCommand = new RelayCommand(_ => OpenRegisterWindow());
         }
 
-        // Change this method to be synchronous (no async/await/Task)
         private void OpenRegisterWindow()
         {
             var registerViewModel = new RegisterViewModel(_apiClient);
