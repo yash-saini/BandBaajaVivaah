@@ -5,10 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BandBaajaVivaah.WPF.Views"
         mc:Ignorable="d"
-        Title="Register" Height="350" Width="400"
+        Title="Register" Height="400" Width="400"
         WindowStartupLocation="CenterScreen">
     <Grid Margin="20">
-        <StackPanel VerticalAlignment="Center">
+        <StackPanel>
             <Label Content="Full Name:" Style="{StaticResource Styles.Label}"/>
             <TextBox Text="{Binding FullName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource Styles.TextBox}"/>
 
