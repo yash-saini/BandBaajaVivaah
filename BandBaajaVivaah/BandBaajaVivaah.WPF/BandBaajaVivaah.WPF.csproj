@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="ViewModel\" />
+    <ProjectReference Include="..\BandBaajaVivaah.Contracts\BandBaajaVivaah.Contracts.csproj" />
   </ItemGroup>
 
 </Project>
