@@ -3,6 +3,7 @@ using BandBaajaVivaah.WPF.Commands;
 using BandBaajaVivaah.WPF.Services;
 using BandBaajaVivaah.WPF.ViewModel.Base;
 using BandBaajaVivaah.WPF.Views;
+using System.Windows;
 using System.Windows.Input;
 
 namespace BandBaajaVivaah.WPF.ViewModel
@@ -67,10 +68,12 @@ namespace BandBaajaVivaah.WPF.ViewModel
 
         private void OpenRegisterWindow()
         {
+            var loginWindow = Application.Current.Windows.OfType<LoginView>().FirstOrDefault();
             var registerViewModel = new RegisterViewModel(_apiClient);
             var registerView = new RegisterView
             {
-                DataContext = registerViewModel
+                DataContext = registerViewModel,
+                Owner = loginWindow
             };
             registerView.ShowDialog();
         }
