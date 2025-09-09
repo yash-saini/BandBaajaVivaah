@@ -75,6 +75,35 @@ namespace BandBaajaVivaah.WPF.Services
             }
             return null;
         }
+
+        /// <summary>
+        /// Registers a new user.
+        /// </summary>
+        /// <returns>True if registration is successful, otherwise false.</returns>
+        public async Task<RegistrationResult> RegisterAsync(UserRegisterDto registerDto)
+        {
+            try
+            {
+                var response = await _httpClient.PostAsJsonAsync("api/auth/register", registerDto);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return RegistrationResult.Success;
+                }
+
+                if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
+                {
+                    return RegistrationResult.EmailAlreadyExists;
+                }
+
+                return RegistrationResult.Failure;
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                return RegistrationResult.Failure;
+            }
+        }
     }
 
     /// <summary>
@@ -83,5 +112,12 @@ namespace BandBaajaVivaah.WPF.Services
     public class LoginResponse
     {
         public string? Token { get; set; }
+    }
+
+    public enum RegistrationResult
+    {
+        Success,
+        EmailAlreadyExists,
+        Failure
     }
 }

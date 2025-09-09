@@ -9,6 +9,8 @@ namespace BandBaajaVivaah.Services
         Task<UserDto?> GetUserByIdAsync(int userId);
         Task<User> RegisterUserAsync(string fullName, string email, string password);
         Task<User?> LoginAsync(string email, string password);
+
+        Task<User?> GetUserByEmailAsync(string email);
     }
 
     public class UserService : IUserService
@@ -62,6 +64,11 @@ namespace BandBaajaVivaah.Services
                 return null; // Invalid credentials
             }
             return user;
+        }
+
+        public async Task<User?> GetUserByEmailAsync(string email)
+        {
+            return await _unitOfWork.Users.GetByEmailAsync(email);
         }
     }
 }

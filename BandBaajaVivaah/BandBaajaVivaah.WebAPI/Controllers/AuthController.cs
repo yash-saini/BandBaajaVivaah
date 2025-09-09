@@ -14,7 +14,7 @@ namespace BandBaajaVivaah.WebAPI.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly IConfiguration _configuration; // Add this
+        private readonly IConfiguration _configuration;
 
         public AuthController(IUserService userService, IConfiguration configuration) // Add IConfiguration here
         {
@@ -25,16 +25,19 @@ namespace BandBaajaVivaah.WebAPI.Controllers
         [HttpPost("register")] // POST: api/auth/register
         public async Task<IActionResult> Register([FromBody] UserRegisterDto registerDto)
         {
-            // The [ApiController] attribute handles model state validation automatically
-            // so we don't need to check if(ModelState.IsValid)
+            // First, check if a user with this email already exists
+            var existingUser = await _userService.GetUserByEmailAsync(registerDto.Email);
+            if (existingUser != null)
+            {
+                // Return a 409 Conflict status with a specific message
+                return Conflict(new { Message = "A user with this email already exists." });
+            }
 
             var newUser = await _userService.RegisterUserAsync(
                 registerDto.FullName,
                 registerDto.Email,
                 registerDto.Password);
 
-            // We don't return the full user object, especially the password hash
-            // For now, returning a simple Ok is fine.
             return Ok(new { Message = "User registered successfully" });
         }
 

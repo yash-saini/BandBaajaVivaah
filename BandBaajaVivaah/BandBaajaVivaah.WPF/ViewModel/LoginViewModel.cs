@@ -2,6 +2,7 @@
 using BandBaajaVivaah.WPF.Commands;
 using BandBaajaVivaah.WPF.Services;
 using BandBaajaVivaah.WPF.ViewModel.Base;
+using BandBaajaVivaah.WPF.Views;
 using System.Windows.Input;
 
 namespace BandBaajaVivaah.WPF.ViewModel
@@ -44,6 +45,7 @@ namespace BandBaajaVivaah.WPF.ViewModel
         }
 
         public ICommand LoginCommand { get; }
+        public ICommand RegisterCommand { get; }
 
         private bool _isLoginSuccessful;
         public bool IsLoginSuccessful
@@ -62,6 +64,18 @@ namespace BandBaajaVivaah.WPF.ViewModel
         {
             _apiClient = apiClient ?? throw new ArgumentNullException(nameof(apiClient));
             LoginCommand = new RelayCommand(async _ => await LoginAsync(), _ => CanLogin());
+            RegisterCommand = new RelayCommand(_ => OpenRegisterWindow());
+        }
+
+        // Change this method to be synchronous (no async/await/Task)
+        private void OpenRegisterWindow()
+        {
+            var registerViewModel = new RegisterViewModel(_apiClient);
+            var registerView = new RegisterView
+            {
+                DataContext = registerViewModel
+            };
+            registerView.ShowDialog();
         }
 
         private bool CanLogin()
