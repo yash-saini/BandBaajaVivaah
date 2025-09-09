@@ -63,10 +63,16 @@ namespace BandBaajaVivaah.WPF.ViewModel
         public ICommand RegisterCommand { get; }
 
         private readonly ApiClientService _apiClient;
+
         public RegisterViewModel(ApiClientService apiClient)
         {
             _apiClient = apiClient;
-            RegisterCommand = new RelayCommand(async _ => await RegisterAsync());
+            RegisterCommand = new RelayCommand(async _ => await RegisterAsync(), _ => CanRegister());
+        }
+
+        private bool CanRegister()
+        {
+            return !string.IsNullOrEmpty(Email) && !string.IsNullOrEmpty(Password) && !string.IsNullOrEmpty(FullName);
         }
 
         private async Task RegisterAsync()
