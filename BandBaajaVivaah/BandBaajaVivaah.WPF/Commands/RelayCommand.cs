@@ -4,12 +4,13 @@ namespace BandBaajaVivaah.WPF.Commands
 {
     public class RelayCommand : ICommand
     {
-        private readonly Action<object> _execute;
+        private readonly Func<object, Task> _executeAsync;
         private readonly Predicate<object?> _canExecute;
+        private bool _isExecuting;
 
-        public RelayCommand(Action<object> execute, Predicate<object?> canExecute)
+        public RelayCommand(Func<object, Task> executeAsync, Predicate<object?> canExecute = null)
         {
-            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
+            _executeAsync = executeAsync ?? throw new ArgumentNullException(nameof(executeAsync));
             _canExecute = canExecute;
         }
 
@@ -21,13 +22,28 @@ namespace BandBaajaVivaah.WPF.Commands
 
         public bool CanExecute(object? parameter)
         {
-            return _canExecute == null || _canExecute(parameter);
+            return !_isExecuting && (_canExecute == null || _canExecute(parameter));
         }
 
-        public void Execute(object? parameter)
+        public async void Execute(object? parameter)
         {
-            if(parameter != null)
-                _execute(parameter);
+            if (!CanExecute(parameter))
+                return;
+
+            try
+            {
+                _isExecuting = true;
+                // Raise the CanExecuteChanged event to disable the command while it's executing
+                CommandManager.InvalidateRequerySuggested();
+
+                await _executeAsync(parameter);
+            }
+            finally
+            {
+                _isExecuting = false;
+                // Raise the CanExecuteChanged event to re-enable the command
+                CommandManager.InvalidateRequerySuggested();
+            }
         }
     }
 }
