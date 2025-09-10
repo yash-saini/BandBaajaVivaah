@@ -15,5 +15,9 @@ public partial class User
 
     public string Role { get; set; } = null!;
 
+    public string? PasswordResetToken { get; set; }
+
+    public DateTime? ResetTokenExpires { get; set; }
+
     public virtual ICollection<Wedding> Weddings { get; set; } = new List<Wedding>();
 }
