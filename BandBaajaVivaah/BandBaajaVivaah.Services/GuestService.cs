@@ -10,7 +10,7 @@ namespace BandBaajaVivaah.Services
         Task<GuestDto> CreateGuestAsync(CreateGuestDto guestDto, int userId);
     }
 
-    internal class GuestService : IGuestService
+    public class GuestService : IGuestService
     {
         private readonly IUnitOfWork _unitOfWork;
 
