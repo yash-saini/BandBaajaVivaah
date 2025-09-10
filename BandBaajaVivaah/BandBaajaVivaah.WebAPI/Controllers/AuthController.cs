@@ -75,5 +75,29 @@ namespace BandBaajaVivaah.WebAPI.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        // POST: api/auth/forgot-password
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto forgotPasswordDto)
+        {
+            var result = await _userService.GeneratePasswordResetTokenAsync(forgotPasswordDto.Email);
+            if (!result)
+            {
+                return Ok(new { Message = "If an account with this email exists, a password reset link has been sent." });
+            }
+            return Ok(new { Message = "If an account with this email exists, a password reset link has been sent." });
+        }
+
+        // POST: api/auth/reset-password
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto resetPasswordDto)
+        {
+            var result = await _userService.ResetPasswordAsync(resetPasswordDto.Email, resetPasswordDto.Token, resetPasswordDto.NewPassword);
+            if (!result)
+            {
+                return BadRequest(new { Message = "Invalid token or email." });
+            }
+            return Ok(new { Message = "Password has been reset successfully." });
+        }
     }
 }
