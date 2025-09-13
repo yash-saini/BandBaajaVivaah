@@ -6,10 +6,13 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="Resources/Styles/Common/Controls.Colors.xaml"/>
                 <ResourceDictionary Source="Resources/Styles/Common/Controls.Button.xaml"/>
                 <ResourceDictionary Source="Resources/Styles/Common/Controls.TextBox.xaml"/>
                 <ResourceDictionary Source="Resources/Styles/Common/Controls.Label.xaml"/>
+                <ResourceDictionary Source="/Resources/Styles/Common/Controls.Menu.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
