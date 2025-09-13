@@ -2,6 +2,8 @@
 using BandBaajaVivaah.WPF.Commands;
 using BandBaajaVivaah.WPF.Services;
 using BandBaajaVivaah.WPF.ViewModel.Base;
+using BandBaajaVivaah.WPF.Views;
+using System.Windows;
 using System.Windows.Input;
 
 namespace BandBaajaVivaah.WPF.ViewModel
@@ -16,7 +18,6 @@ namespace BandBaajaVivaah.WPF.ViewModel
             {
                 _email = value;
                 OnPropertyChanged(nameof(Email));
-                CommandManager.InvalidateRequerySuggested();
             }
         }
 
@@ -28,7 +29,6 @@ namespace BandBaajaVivaah.WPF.ViewModel
             {
                 _password = value;
                 OnPropertyChanged(nameof(Password));
-                CommandManager.InvalidateRequerySuggested();
             }
         }
 
@@ -44,6 +44,9 @@ namespace BandBaajaVivaah.WPF.ViewModel
         }
 
         public ICommand LoginCommand { get; }
+        public ICommand RegisterCommand { get; }
+
+        public ICommand ForgotPasswordCommand { get; }
 
         private bool _isLoginSuccessful;
         public bool IsLoginSuccessful
@@ -62,6 +65,30 @@ namespace BandBaajaVivaah.WPF.ViewModel
         {
             _apiClient = apiClient ?? throw new ArgumentNullException(nameof(apiClient));
             LoginCommand = new RelayCommand(async _ => await LoginAsync(), _ => CanLogin());
+            RegisterCommand = new RelayCommand(_ => OpenRegisterWindow());
+            ForgotPasswordCommand = new RelayCommand(_ => OpenForgotPasswordWindow());
+        }
+
+        private void OpenRegisterWindow()
+        {
+            var loginWindow = Application.Current.Windows.OfType<LoginView>().FirstOrDefault();
+            var registerViewModel = new RegisterViewModel(_apiClient);
+            var registerView = new RegisterView
+            {
+                DataContext = registerViewModel,
+                Owner = loginWindow
+            };
+            registerView.ShowDialog();
+        }
+
+        private void OpenForgotPasswordWindow()
+        {
+            var viewModel = new ForgotPasswordViewModel(_apiClient);
+            var view = new ForgotPasswordView
+            {
+                DataContext = viewModel
+            };
+            view.ShowDialog();
         }
 
         private bool CanLogin()
