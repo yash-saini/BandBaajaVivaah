@@ -117,6 +117,19 @@ namespace BandBaajaVivaah.WPF.Services
                 return false;
             }
         }
+
+        public async Task<bool> ResetPasswordAsync(ResetPasswordDto resetDto)
+        {
+            try
+            {
+                var response = await _httpClient.PostAsJsonAsync("api/auth/reset-password", resetDto);
+                return response.IsSuccessStatusCode;
+            }
+            catch (HttpRequestException)
+            {
+                return false;
+            }
+        }
     }
 
     /// <summary>

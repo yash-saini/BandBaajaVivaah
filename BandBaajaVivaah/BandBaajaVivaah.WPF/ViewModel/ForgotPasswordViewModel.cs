@@ -1,6 +1,7 @@
 ﻿using BandBaajaVivaah.WPF.Commands;
 using BandBaajaVivaah.WPF.Services;
 using BandBaajaVivaah.WPF.ViewModel.Base;
+using BandBaajaVivaah.WPF.Views;
 using System.Windows.Input;
 
 namespace BandBaajaVivaah.WPF.ViewModel
@@ -44,7 +45,15 @@ namespace BandBaajaVivaah.WPF.ViewModel
             var success = await _apiClient.ForgotPasswordAsync(this.Email);
             if (success)
             {
-                Message = "If an account exists, an email has been sent.";
+                Message = "If an account exists, an email has been sent. You can now use the token from the email to reset your password.";
+
+                // Open the next window in the flow
+                var resetViewModel = new ResetPasswordViewModel(_apiClient, this.Email);
+                var resetView = new ResetPasswordView
+                {
+                    DataContext = resetViewModel
+                };
+                resetView.ShowDialog();
             }
             else
             {
