@@ -90,7 +90,6 @@ namespace BandBaajaVivaah.Services
             await _emailService.SendPasswordResetEmailAsync(user.Email, token);
 
             return true;
-
         }
 
         public async Task<bool> ResetPasswordAsync(string email, string token, string newPassword)
