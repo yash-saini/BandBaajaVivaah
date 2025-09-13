@@ -46,6 +46,8 @@ namespace BandBaajaVivaah.WPF.ViewModel
         public ICommand LoginCommand { get; }
         public ICommand RegisterCommand { get; }
 
+        public ICommand ForgotPasswordCommand { get; }
+
         private bool _isLoginSuccessful;
         public bool IsLoginSuccessful
         {
@@ -64,6 +66,7 @@ namespace BandBaajaVivaah.WPF.ViewModel
             _apiClient = apiClient ?? throw new ArgumentNullException(nameof(apiClient));
             LoginCommand = new RelayCommand(async _ => await LoginAsync(), _ => CanLogin());
             RegisterCommand = new RelayCommand(_ => OpenRegisterWindow());
+            ForgotPasswordCommand = new RelayCommand(_ => OpenForgotPasswordWindow());
         }
 
         private void OpenRegisterWindow()
@@ -76,6 +79,16 @@ namespace BandBaajaVivaah.WPF.ViewModel
                 Owner = loginWindow
             };
             registerView.ShowDialog();
+        }
+
+        private void OpenForgotPasswordWindow()
+        {
+            var viewModel = new ForgotPasswordViewModel(_apiClient);
+            var view = new ForgotPasswordView
+            {
+                DataContext = viewModel
+            };
+            view.ShowDialog();
         }
 
         private bool CanLogin()

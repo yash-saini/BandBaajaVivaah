@@ -19,6 +19,12 @@
 
             <Label Content="{Binding ErrorMessage}" Foreground="Red" Style="{StaticResource Styles.Label}" HorizontalAlignment="Center" Margin="0,10,0,0"/>
 
+            <TextBlock HorizontalAlignment="Center" Margin="0,5,0,0">
+                    <Hyperlink Command="{Binding ForgotPasswordCommand}">
+                        <Run Text="Forgot Password?"/>
+                    </Hyperlink>
+            </TextBlock>
+            
             <TextBlock HorizontalAlignment="Center" Margin="0,10,0,0">
                 <TextBlock.Inlines>
                     <Run Text="Don't have an account? "/>
