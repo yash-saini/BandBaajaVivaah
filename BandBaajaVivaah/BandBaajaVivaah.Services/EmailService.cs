@@ -1,6 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
-using SendGrid;
-using SendGrid.Helpers.Mail;
+﻿using MailKit.Net.Smtp;
+using MailKit.Security;
+using Microsoft.Extensions.Configuration;
+using MimeKit;
 
 namespace BandBaajaVivaah.Services
 {
@@ -20,16 +21,32 @@ namespace BandBaajaVivaah.Services
 
         public async Task SendPasswordResetEmailAsync(string toEmail, string resetToken)
         {
-            var apiKey = _configuration["SendGrid:ApiKey"];
-            var client = new SendGridClient(apiKey);
-            var from = new EmailAddress("no-reply@bandbaajavivaah.com", "Band Baaja Vivaah");
-            var to = new EmailAddress(toEmail);
-            var subject = "Password Reset Request";
-            var plainTextContent = $"Your password reset token is: {resetToken}";
-            // In a real app, you'd send a link to your frontend app's reset page
-            var htmlContent = $"<strong>Your password reset token is:</strong> {resetToken}";
-            var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
-            await client.SendEmailAsync(msg);
+            var email = new MimeMessage();
+
+            // Get the "From" address from config, or use a default
+            var fromAddress = _configuration["SmtpSettings:Username"];
+            email.From.Add(MailboxAddress.Parse(fromAddress));
+
+            email.To.Add(MailboxAddress.Parse(toEmail));
+            email.Subject = "Password Reset Request";
+            email.Body = new TextPart("plain")
+            {
+                Text = $"Your password reset token is: {resetToken}"
+            };
+
+            using var smtp = new SmtpClient();
+
+            await smtp.ConnectAsync(
+                _configuration["SmtpSettings:Host"],
+                int.Parse(_configuration["SmtpSettings:Port"]),
+                SecureSocketOptions.StartTls);
+
+            await smtp.AuthenticateAsync(
+                _configuration["SmtpSettings:Username"],
+                _configuration["SmtpSettings:Password"]);
+
+            await smtp.SendAsync(email);
+            await smtp.DisconnectAsync(true);
         }
     }
 }

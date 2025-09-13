@@ -104,6 +104,19 @@ namespace BandBaajaVivaah.WPF.Services
                 return RegistrationResult.Failure;
             }
         }
+
+        public async Task<bool> ForgotPasswordAsync(string email)
+        {
+            try
+            {
+                var response = await _httpClient.PostAsJsonAsync("api/auth/forgot-password", new { email });
+                return response.IsSuccessStatusCode;
+            }
+            catch (HttpRequestException)
+            {
+                return false;
+            }
+        }
     }
 
     /// <summary>
