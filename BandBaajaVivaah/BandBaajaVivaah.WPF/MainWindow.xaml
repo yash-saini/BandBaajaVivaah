@@ -10,7 +10,8 @@
         mc:Ignorable="d"
         Title="Band Baaja Vivaah" Height="450" Width="800"
         TitleForeground="WhiteSmoke"
-        WindowTitleBrush="SlateGray">
+        WindowTitleBrush="SlateGray"
+        Icon="/Resources/Images/favicon.ico">
 
     <DockPanel>
         <views:ToolbarView DockPanel.Dock="Top" DataContext="{Binding ToolbarViewModel}"/>
