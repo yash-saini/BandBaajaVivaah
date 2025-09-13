@@ -75,6 +75,61 @@ namespace BandBaajaVivaah.WPF.Services
             }
             return null;
         }
+
+        /// <summary>
+        /// Registers a new user.
+        /// </summary>
+        /// <returns>True if registration is successful, otherwise false.</returns>
+        public async Task<RegistrationResult> RegisterAsync(UserRegisterDto registerDto)
+        {
+            try
+            {
+                var response = await _httpClient.PostAsJsonAsync("api/auth/register", registerDto);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return RegistrationResult.Success;
+                }
+
+                if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
+                {
+                    return RegistrationResult.EmailAlreadyExists;
+                }
+
+                return RegistrationResult.Failure;
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                return RegistrationResult.Failure;
+            }
+        }
+
+        public async Task<bool> ForgotPasswordAsync(string email)
+        {
+            try
+            {
+                var response = await _httpClient.PostAsJsonAsync("api/auth/forgot-password", new { email });
+                return response.IsSuccessStatusCode;
+            }
+            catch (HttpRequestException)
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> ResetPasswordAsync(ResetPasswordDto resetDto)
+        {
+            try
+            {
+                var response = await _httpClient.PostAsJsonAsync("api/auth/reset-password", resetDto);
+                return response.IsSuccessStatusCode;
+            }
+            catch (HttpRequestException)
+            {
+                return false;
+            }
+        }
     }
 
     /// <summary>
@@ -83,5 +138,12 @@ namespace BandBaajaVivaah.WPF.Services
     public class LoginResponse
     {
         public string? Token { get; set; }
+    }
+
+    public enum RegistrationResult
+    {
+        Success,
+        EmailAlreadyExists,
+        Failure
     }
 }
