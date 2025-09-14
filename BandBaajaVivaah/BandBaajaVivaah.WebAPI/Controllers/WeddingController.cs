@@ -64,5 +64,31 @@ namespace BandBaajaVivaah.Api.Controllers
 
             return CreatedAtAction(nameof(GetWeddingById), new { id = createdWedding.WeddingID }, createdWedding);
         }
+
+        // DELETE: api/weddings/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteWedding(int id)
+        {
+            var userId = GetCurrentUserId();
+            var success = await _weddingService.DeleteWeddingAsync(id, userId);
+            if (!success)
+            {
+                return NotFound(); // Wedding not found or user does not own it
+            }
+            return NoContent(); // Successfully deleted
+        }
+
+        // PUT: api/weddings/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateWedding(int id, [FromBody] CreateWeddingDto weddingDto)
+        {
+            var userId = GetCurrentUserId();
+            var success = await _weddingService.UpdateWeddingAsync(id, weddingDto, userId);
+            if (!success)
+            {
+                return NotFound(); // Wedding not found or user does not own it
+            }
+            return NoContent(); // Successfully updated
+        }
     }
 }

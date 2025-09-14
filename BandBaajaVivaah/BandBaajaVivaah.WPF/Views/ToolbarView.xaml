@@ -8,7 +8,7 @@
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mc:Ignorable="d" 
              d:DesignHeight="30" d:DesignWidth="800"
-             Background="DarkOrange">
+             Background="Gold">
     <Grid>
         <mah:DropDownButton
             VerticalAlignment="Center"
@@ -25,7 +25,7 @@
             </mah:DropDownButton.Content>
 
             <mah:DropDownButton.Items>
-                <MenuItem Header="Logout" Command="{Binding LogoutCommand}" Style="{StaticResource Styles.MenuItem}"/>
+                <MenuItem Header="Logout" Command="{Binding LogoutCommand}" Style="{StaticResource Styles.MenuItem}" Background="Gold"/>
             </mah:DropDownButton.Items>
 
         </mah:DropDownButton>
