@@ -9,7 +9,7 @@
              d:DesignHeight="40" d:DesignWidth="800"
              Background="DarkOrange">
     <DockPanel>
-        <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" Margin="5,0">
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" Margin="0,5,10,3">
             <Button x:Name="BackButton" Click="BackButton_Click"
                 Style="{StaticResource Styles.ButtonOnPageToolBar}" 
                 Margin="5,0,20,0"
@@ -19,7 +19,7 @@
 
             <Button x:Name="SaveButton" Click="SaveButton_Click"
                     Style="{StaticResource Styles.ButtonOnPageToolBar}" 
-                    Margin="0,0,10,0"
+                    Margin="5,0,20,0"
                     ToolTip="Save">
                 <iconPacks:PackIconMaterial Kind="Floppy" Width="24" Height="15"/>
             </Button>
