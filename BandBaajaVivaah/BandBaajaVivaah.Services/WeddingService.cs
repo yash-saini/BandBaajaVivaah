@@ -9,6 +9,9 @@ namespace BandBaajaVivaah.Services
         Task<WeddingDto?> GetWeddingByIdAsync(int weddingId, int userId);
         Task<IEnumerable<WeddingDto>> GetWeddingsForUserAsync(int userId);
         Task<WeddingDto> CreateWeddingAsync(CreateWeddingDto weddingDto, int ownerUserId);
+
+        Task<bool> DeleteWeddingAsync(int weddingId, int ownerUserId);
+        Task<bool> UpdateWeddingAsync(int weddingId, CreateWeddingDto weddingDto, int ownerUserId);
     }
 
     public class WeddingService : IWeddingService
@@ -73,6 +76,32 @@ namespace BandBaajaVivaah.Services
                 TotalBudget = w.TotalBudget,
                 OwnerUserId = w.OwnerUserId
             });
+        }
+
+        public async Task<bool> DeleteWeddingAsync(int weddingId, int ownerUserId)
+        {
+            var wedding = await _unitOfWork.Weddings.GetByIdAsync(weddingId);
+            if (wedding == null || wedding.OwnerUserId != ownerUserId)
+            {
+                return false; // Not found or user does not have access
+            }
+            await _unitOfWork.Weddings.DeleteAsync(weddingId);
+            await _unitOfWork.CompleteAsync();
+            return true;
+        }
+
+        public async Task<bool> UpdateWeddingAsync(int weddingId, CreateWeddingDto weddingDto, int ownerUserId)
+        {
+            var wedding = await _unitOfWork.Weddings.GetByIdAsync(weddingId);
+            if (wedding == null || wedding.OwnerUserId != ownerUserId)
+            {
+                return false; // Not found or user does not have access
+            }
+            wedding.WeddingName = weddingDto.WeddingName;
+            wedding.WeddingDate = weddingDto.WeddingDate;
+            wedding.TotalBudget = weddingDto.TotalBudget;
+            await _unitOfWork.CompleteAsync();
+            return true;
         }
     }
 }

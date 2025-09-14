@@ -25,5 +25,14 @@
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Padding" Value="0"/>
     </Style>
-    
+
+    <Style x:Key="Styles.ButtonOnPageToolBar" TargetType="Button" BasedOn="{StaticResource Styles.Button}">
+        <Setter Property="Background" Value="{StaticResource BrushOnPageToolBarBackground}"/>
+        <Setter Property="Foreground" Value="{StaticResource BrushOnPageToolBarForeground}"/>
+        <Style.Triggers>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{DynamicResource BrushOnPageToolBarClickableBackground}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
 </ResourceDictionary>

@@ -1,0 +1,28 @@
+﻿<Page x:Class="BandBaajaVivaah.WPF.Views.Pages.AddEditWeddingsView"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:BandBaajaVivaah.WPF.Views.Pages"
+      xmlns:views="clr-namespace:BandBaajaVivaah.WPF.Views"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Background="White"
+      Title="AddEditWeddingsView">
+    
+    <DockPanel Margin="10">
+        <views:AddEditToolBar DockPanel.Dock="Top"
+                                   BackButtonClicked="Toolbar_BackButtonClicked"
+                                   SaveButtonClicked="Toolbar_SaveButtonClicked"/>
+        <StackPanel Margin="20">
+            <TextBlock Text="Wedding Name" />
+            <TextBox Text="{Binding WeddingName, UpdateSourceTrigger=PropertyChanged}" Width="300"/>
+
+            <TextBlock Text="Wedding Date" Margin="0,10,0,0"/>
+            <DatePicker SelectedDate="{Binding WeddingDate}" Width="200"/>
+
+            <TextBlock Text="Budget" Margin="0,10,0,0"/>
+            <TextBox Text="{Binding TotalBudget}" Width="200"/>
+        </StackPanel>
+    </DockPanel>
+</Page>

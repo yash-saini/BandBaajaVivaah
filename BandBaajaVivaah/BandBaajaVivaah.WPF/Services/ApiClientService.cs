@@ -130,6 +130,55 @@ namespace BandBaajaVivaah.WPF.Services
                 return false;
             }
         }
+
+        public async Task<bool> DeleteWeddingAsync(int weddingId)
+        {
+            try
+            {
+                var response = await _httpClient.DeleteAsync($"api/weddings/{weddingId}");
+                return response.IsSuccessStatusCode;
+            }
+            catch (HttpRequestException)
+            {
+                return false;
+            }
+        }
+
+        public async Task<WeddingDto?> CreateWeddingAsync(CreateWeddingDto createDto)
+        {
+            try
+            {
+                var response = await _httpClient.PostAsJsonAsync("api/weddings", createDto);
+                if (response.IsSuccessStatusCode)
+                {
+                    var wedding = await response.Content.ReadFromJsonAsync<WeddingDto>();
+                    return wedding;
+                }
+            }
+            catch (HttpRequestException)
+            {
+                return null;
+            }
+            return null;
+        }
+
+        public async Task<WeddingDto?> UpdateWeddingAsync(int weddingId, CreateWeddingDto updateDto)
+        {
+            try
+            {
+                var response = await _httpClient.PutAsJsonAsync($"api/weddings/{weddingId}", updateDto);
+                if (response.IsSuccessStatusCode)
+                {
+                    var wedding = await response.Content.ReadFromJsonAsync<WeddingDto>();
+                    return wedding;
+                }
+            }
+            catch (HttpRequestException)
+            {
+                return null;
+            }
+            return null;
+        }
     }
 
     /// <summary>

@@ -16,6 +16,11 @@ namespace BandBaajaVivaah.WPF.Services
             _mainFrame.Navigate(pageUri);
         }
 
+        public void NavigateTo(Page page)
+        {
+            _mainFrame.Navigate(page);
+        }
+
         public void GoBack()
         {
             if (_mainFrame.CanGoBack)

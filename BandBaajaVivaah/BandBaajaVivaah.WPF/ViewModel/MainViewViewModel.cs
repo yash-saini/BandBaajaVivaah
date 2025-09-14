@@ -1,6 +1,7 @@
 ﻿using BandBaajaVivaah.WPF.Commands;
 using BandBaajaVivaah.WPF.Services;
 using BandBaajaVivaah.WPF.ViewModel.Base;
+using BandBaajaVivaah.WPF.Views.Pages;
 using System.Windows.Input;
 
 namespace BandBaajaVivaah.WPF.ViewModel
@@ -28,17 +29,18 @@ namespace BandBaajaVivaah.WPF.ViewModel
             _navigationService = navigationService;
             CurrentUserName = userName;
             WelcomeMessage = $"Welcome, {userName.Split('@')[0]}!";
-            
+
             NavigateToWeddingsCommand = new RelayCommand(_ =>
-                _navigationService.NavigateTo(new Uri("/Views/Pages/WeddingsView.xaml", UriKind.Relative)));
-            NavigateToTasksCommand = new RelayCommand(_ =>
-                 _navigationService.NavigateTo(new Uri("/Views/Pages/TasksView.xaml", UriKind.Relative)));
+                _navigationService.NavigateTo(new WeddingsView(_apiClient, _navigationService)));
 
-            NavigateToGuestsCommand = new RelayCommand(_ =>
-                _navigationService.NavigateTo(new Uri("/Views/Pages/GuestsView.xaml", UriKind.Relative)));
+            //NavigateToTasksCommand = new RelayCommand(_ =>
+            //     _navigationService.NavigateTo(new Uri("/Views/Pages/TasksView.xaml", UriKind.Relative)));
 
-            NavigateToExpensesCommand = new RelayCommand(_ =>
-                _navigationService.NavigateTo(new Uri("/Views/Pages/ExpensesView.xaml", UriKind.Relative)));
+            //NavigateToGuestsCommand = new RelayCommand(_ =>
+            //    _navigationService.NavigateTo(new Uri("/Views/Pages/GuestsView.xaml", UriKind.Relative)));
+
+            //NavigateToExpensesCommand = new RelayCommand(_ =>
+            //    _navigationService.NavigateTo(new Uri("/Views/Pages/ExpensesView.xaml", UriKind.Relative)));
 
             ToolbarViewModel = new ToolbarViewModel(userName);
             ToolbarViewModel.CloseWindow = () => Logout();
