@@ -24,8 +24,8 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
             }
         }
 
-        private DateTime _weddingDate;
-        public DateTime WeddingDate
+        private DateTime? _weddingDate;
+        public DateTime? WeddingDate
         {
             get => _weddingDate;
             set
@@ -35,8 +35,8 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
             }
         }
 
-        private decimal _totalBudget;
-        public decimal TotalBudget
+        private decimal? _totalBudget;
+        public decimal? TotalBudget
         {
             get => _totalBudget;
             set
@@ -73,8 +73,8 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
             var dto = new CreateWeddingDto
             {
                 WeddingName = this.WeddingName,
-                WeddingDate = this.WeddingDate,
-                TotalBudget = this.TotalBudget
+                WeddingDate = this.WeddingDate.HasValue ? this.WeddingDate.Value : DateTime.Today,
+                TotalBudget = this.TotalBudget.HasValue ? this.TotalBudget.Value : 0
             };
 
             bool success;
