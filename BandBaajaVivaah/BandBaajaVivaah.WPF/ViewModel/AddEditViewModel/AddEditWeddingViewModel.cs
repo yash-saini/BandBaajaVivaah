@@ -83,10 +83,9 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
                 var newWedding = await _apiClient.CreateWeddingAsync(dto);
                 success = newWedding != null;
             }
-            else
+            else // Edit Mode
             {
-                var updatedWedding = await _apiClient.UpdateWeddingAsync(_editingWedding.WeddingID, dto);
-                success = (updatedWedding != null);
+                success = await _apiClient.UpdateWeddingAsync(_editingWedding.WeddingID, dto);
             }
 
             if (success)
