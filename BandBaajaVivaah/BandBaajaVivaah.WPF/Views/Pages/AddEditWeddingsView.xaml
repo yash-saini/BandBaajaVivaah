@@ -16,7 +16,7 @@
                                    SaveButtonClicked="Toolbar_SaveButtonClicked"/>
         <StackPanel Margin="20">
             <TextBlock Text="Wedding Name" />
-            <TextBox Text="{Binding WeddingName, UpdateSourceTrigger=PropertyChanged}" Width="300"/>
+            <TextBox Text="{Binding WeddingName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="300"/>
 
             <TextBlock Text="Wedding Date" Margin="0,10,0,0"/>
             <DatePicker SelectedDate="{Binding WeddingDate}" Width="200"/>

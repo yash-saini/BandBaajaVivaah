@@ -162,22 +162,17 @@ namespace BandBaajaVivaah.WPF.Services
             return null;
         }
 
-        public async Task<WeddingDto?> UpdateWeddingAsync(int weddingId, CreateWeddingDto updateDto)
+        public async Task<bool> UpdateWeddingAsync(int weddingId, CreateWeddingDto updateDto)
         {
             try
             {
                 var response = await _httpClient.PutAsJsonAsync($"api/weddings/{weddingId}", updateDto);
-                if (response.IsSuccessStatusCode)
-                {
-                    var wedding = await response.Content.ReadFromJsonAsync<WeddingDto>();
-                    return wedding;
-                }
+                return response.IsSuccessStatusCode;
             }
             catch (HttpRequestException)
             {
-                return null;
+                return false;
             }
-            return null;
         }
     }
 
