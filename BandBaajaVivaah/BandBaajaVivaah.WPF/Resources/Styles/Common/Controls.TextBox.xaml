@@ -6,4 +6,11 @@
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="Margin" Value="0,5"/>
     </Style>
+
+    <Style x:Key="Styles.DataEntryTextBox" TargetType="TextBox">
+        <Setter Property="Width" Value="300"/>
+        <Setter Property="Height" Value="28"/>
+        <Setter Property="Margin" Value="0,2,0,0"/>
+        <Setter Property="Padding" Value="5,2"/>
+    </Style>
 </ResourceDictionary>

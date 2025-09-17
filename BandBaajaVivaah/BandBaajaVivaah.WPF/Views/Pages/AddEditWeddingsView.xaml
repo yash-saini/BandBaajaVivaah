@@ -9,20 +9,50 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Background="White"
       Title="AddEditWeddingsView">
-    
+
     <DockPanel Margin="10">
         <views:AddEditToolBar DockPanel.Dock="Top"
-                                   BackButtonClicked="Toolbar_BackButtonClicked"
-                                   SaveButtonClicked="Toolbar_SaveButtonClicked"/>
-        <StackPanel Margin="20">
-            <TextBlock Text="Wedding Name" />
-            <TextBox Text="{Binding WeddingName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="300"/>
+                          BackButtonClicked="Toolbar_BackButtonClicked"
+                          SaveButtonClicked="Toolbar_SaveButtonClicked"/>
 
-            <TextBlock Text="Wedding Date" Margin="0,10,0,0"/>
-            <DatePicker SelectedDate="{Binding WeddingDate}" Width="200"/>
+        <Grid Margin="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <!-- Labels -->
+                <ColumnDefinition Width="*"/>
+                <!-- Inputs -->
+            </Grid.ColumnDefinitions>
 
-            <TextBlock Text="Budget" Margin="0,10,0,0"/>
-            <TextBox Text="{Binding TotalBudget}" Width="200"/>
-        </StackPanel>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Wedding Name -->
+            <Label Content="Wedding Name"
+               Style="{StaticResource Styles.Label}"
+               Grid.Row="0" Grid.Column="0" VerticalAlignment="Center"/>
+            <TextBox Text="{Binding WeddingName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                 Style="{StaticResource Styles.DataEntryTextBox}"
+                 Grid.Row="0" Grid.ColumnSpan="2" Margin="-17,4,167,2"/>
+
+            <!-- Wedding Date -->
+            <Label Content="Wedding Date"
+               Style="{StaticResource Styles.Label}"
+               Grid.Row="1" Grid.Column="0" VerticalAlignment="Center"/>
+            <DatePicker SelectedDate="{Binding WeddingDate}"
+                    Style="{StaticResource Styles.DatePicker}"
+                    Grid.Row="1" Margin="35,5,315,0" Grid.ColumnSpan="2"/>
+
+            <!-- Budget -->
+            <Label Content="Budget"
+               Style="{StaticResource Styles.Label}"
+               Grid.Row="2" Grid.Column="0" VerticalAlignment="Center"/>
+            <TextBox Text="{Binding TotalBudget,TargetNullValue = ''}"
+                 Style="{StaticResource Styles.DataEntryTextBox}"
+                 Grid.Row="2" Grid.ColumnSpan="2" Margin="-14,4,167,2"/>
+        </Grid>
     </DockPanel>
+
 </Page>

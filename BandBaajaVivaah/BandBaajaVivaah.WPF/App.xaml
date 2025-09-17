@@ -13,6 +13,7 @@
                 <ResourceDictionary Source="Resources/Styles/Common/Controls.TextBox.xaml"/>
                 <ResourceDictionary Source="Resources/Styles/Common/Controls.Label.xaml"/>
                 <ResourceDictionary Source="/Resources/Styles/Common/Controls.Menu.xaml"/>
+                <ResourceDictionary Source="Resources/Styles/Common/Controls.DatePicker.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
