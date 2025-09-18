@@ -23,8 +23,8 @@
 
         <DataGrid ItemsSource="{Binding Weddings}" 
                   SelectedItem="{Binding SelectedWedding}"
-                  AutoGenerateColumns="False" 
                   IsReadOnly="True"
+                  Style="{StaticResource Styles.DataGrid}"
                   MouseDoubleClick="DataGrid_MouseDoubleClick">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Wedding Name" Binding="{Binding WeddingName}" Width="*"/>
