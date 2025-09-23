@@ -17,19 +17,63 @@
                                 BackButtonClicked="Toolbar_BackButtonClicked"
                                 AddButtonClicked="Toolbar_AddButtonClicked"
                                 DeleteButtonClicked="Toolbar_DeleteButtonClicked"
-                                RefreshButtonClicked="PageToolBarView_RefreshButtonClicked"/>
+                                RefreshButtonClicked="PageToolBarView_RefreshButtonClicked"
+                                FirstPageClicked="Toolbar_FirstPageClicked"
+                                PreviousPageClicked="Toolbar_PreviousPageClicked"
+                                NextPageClicked="Toolbar_NextPageClicked"
+                                LastPageClicked="Toolbar_LastPageClicked"
+                                CurrentPage="{Binding CurrentPage, Mode=OneWay}"
+                                TotalPages="{Binding TotalPages, Mode=OneWay}"
+                                IsFirstPage="{Binding IsOnFirstPage, Mode=OneWay}"
+                                IsLastPage="{Binding IsOnLastPage, Mode=OneWay}"/>
 
         <TextBlock Text="My Weddings" FontSize="24" FontWeight="Bold" Margin="0,10,0,10" DockPanel.Dock="Top"/>
 
-        <DataGrid ItemsSource="{Binding Weddings}" 
-                  SelectedItem="{Binding SelectedWedding}"
+        <DataGrid ItemsSource="{Binding DisplayedItems}" 
+                  SelectedItem="{Binding SelectedItem}"
                   IsReadOnly="True"
                   Style="{StaticResource Styles.DataGrid}"
                   MouseDoubleClick="DataGrid_MouseDoubleClick">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Wedding Name" Binding="{Binding WeddingName}" Width="*"/>
+                <DataGridTemplateColumn Width="*" SortMemberPath="WeddingName">
+                    <DataGridTemplateColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="Wedding Name" FontWeight="SemiBold"/>
+                                <TextBox Text="{Binding DataContext.SearchName, RelativeSource={RelativeSource AncestorType=Page}, UpdateSourceTrigger=PropertyChanged}" 
+                                         Margin="0,5,0,0"
+                                         Padding="2"
+                                         BorderThickness="1" BorderBrush="Gray"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.HeaderTemplate>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding WeddingName}" VerticalAlignment="Center" Margin="4,0"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                
                 <DataGridTextColumn Header="Date" Binding="{Binding WeddingDate, StringFormat='d'}" Width="150"/>
-                <DataGridTextColumn Header="Budget" Binding="{Binding TotalBudget, StringFormat='C'}" Width="150"/>
+                
+                <DataGridTemplateColumn Width="150" SortMemberPath="TotalBudget">
+                    <DataGridTemplateColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="Budget" FontWeight="SemiBold"/>
+                                <TextBox Text="{Binding DataContext.SearchBudget, RelativeSource={RelativeSource AncestorType=Page}, UpdateSourceTrigger=PropertyChanged}" 
+                                         Margin="0,5,0,0"
+                                         Padding="2"
+                                         BorderThickness="1" BorderBrush="Gray"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.HeaderTemplate>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding TotalBudget, StringFormat='C'}" VerticalAlignment="Center" Margin="4,0"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
     </DockPanel>
