@@ -47,17 +47,37 @@ namespace BandBaajaVivaah.WPF.Views.Pages
         {
             if (ViewModel != null)
             {
-                await ViewModel.LoadWeddingsAsync();
+                await ViewModel.LoadDataAsync();
             }
         }
 
         private void DataGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            if (ViewModel?.SelectedWedding != null)
+            if (ViewModel?.SelectedItem != null)
             {
                 var formPage = new AddEditWeddingsView(_apiClient, _navigationService, ViewModel.SelectedWedding);
                 _navigationService.NavigateTo(formPage);
             }
+        }
+
+        private void Toolbar_FirstPageClicked(object sender, EventArgs e)
+        {     
+            ViewModel?.GoToFirstPage();
+        }
+
+        private void Toolbar_PreviousPageClicked(object sender, EventArgs e)
+        {
+            ViewModel?.GoToPreviousPage();
+        }
+
+        private void Toolbar_NextPageClicked(object sender, EventArgs e)
+        {
+            ViewModel?.GoToNextPage();
+        }
+
+        private void Toolbar_LastPageClicked(object sender, EventArgs e)
+        {
+            ViewModel?.GoToLastPage();
         }
     }
 }

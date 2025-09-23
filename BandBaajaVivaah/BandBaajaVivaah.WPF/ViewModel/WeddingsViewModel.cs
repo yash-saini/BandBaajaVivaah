@@ -6,7 +6,7 @@ using System.Windows;
 
 namespace BandBaajaVivaah.WPF.ViewModel
 {
-    public class WeddingsViewModel : ViewModelBase
+    public class WeddingsViewModel : PageViewModel<WeddingDto>
     {
         private readonly ApiClientService _apiClient;
         private readonly NavigationService _navigationService;
@@ -33,52 +33,90 @@ namespace BandBaajaVivaah.WPF.ViewModel
             }
         }
 
+        private string _searchName;
+        public string SearchName
+        {
+            get => _searchName;
+            set
+            {
+                _searchName = value;
+                OnPropertyChanged(nameof(SearchName));
+                CurrentPage = 1;
+                UpdateDisplayedItems();
+            }
+        }
+
+        private string _searchBudget;
+        public string SearchBudget
+        {
+            get => _searchBudget;
+            set
+            {
+                _searchBudget = value;
+                OnPropertyChanged(nameof(SearchBudget));
+                CurrentPage = 1;
+                UpdateDisplayedItems();
+            }
+        }
+
         public WeddingsViewModel(ApiClientService apiClient, NavigationService navigationService)
         {
             _apiClient = apiClient;
             _navigationService = navigationService;
-            Weddings = new ObservableCollection<WeddingDto>();
-            LoadWeddingsAsync();
+            LoadDataAsync();
         }
 
-        public async Task LoadWeddingsAsync()
+        public override async Task LoadDataAsync()
         {
             var weddingsList = await _apiClient.GetWeddingsAsync();
             if (weddingsList != null)
             {
-                Weddings.Clear();
-                foreach (var wedding in weddingsList)
-                {
-                    Weddings.Add(wedding);
-                }
+                AllItems = weddingsList.ToList(); // Setting the base class's master list
+                CurrentPage = 1;
+                UpdateDisplayedItems(); // Refreshing the view
             }
         }
+
+        protected override IEnumerable<WeddingDto> ApplyFiltering(IEnumerable<WeddingDto> items)
+        {
+            IEnumerable<WeddingDto> filtered = items;
+
+            // Apply Name Filter
+            if (!string.IsNullOrWhiteSpace(SearchName))
+            {
+                filtered = filtered.Where(w => w.WeddingName.StartsWith(SearchName, StringComparison.OrdinalIgnoreCase));
+            }
+
+            // Apply Budget Filter
+            if (!string.IsNullOrWhiteSpace(SearchBudget) && decimal.TryParse(SearchBudget, out var budget))
+            {
+                filtered = filtered.Where(w => w.TotalBudget >= budget);
+            }
+
+            return filtered;
+        }
+
 
         public void GoBack()
         {
             _navigationService.GoBack();
         }
 
-        public void AddWedding()
-        {
-            MessageBox.Show("Logic for adding a new wedding goes here.");
-        }
-
         public async Task DeleteWedding()
         {
-            if (SelectedWedding == null)
+            if (SelectedItem == null)
             {
                 MessageBox.Show("Please select a wedding to delete.");
                 return;
             }
-            var result = MessageBox.Show($"Are you sure you want to delete the wedding - {SelectedWedding.WeddingName}?", "Confirm Delete", MessageBoxButton.YesNo);
+            var result = MessageBox.Show($"Are you sure you want to delete the wedding - {SelectedItem.WeddingName}?", "Confirm Delete", MessageBoxButton.YesNo);
             if (result == MessageBoxResult.Yes)
             {
-                var success = await _apiClient.DeleteWeddingAsync(SelectedWedding.WeddingID);
+                var success = await _apiClient.DeleteWeddingAsync(SelectedItem.WeddingID);
                 if (success)
                 {
-                    Weddings.Remove(SelectedWedding);
-                    SelectedWedding = null;
+                    await LoadDataAsync(); // Reload all data
+                    SelectedItem = null;
                 }
                 else
                 {
