@@ -15,6 +15,7 @@ namespace BandBaajaVivaah.WPF.ViewModel.Base
             {
                 _selectedItem = value;
                 OnPropertyChanged(nameof(SelectedItem));
+                OnPropertyChanged(nameof(IsItemSelected));
             }
         }
 
@@ -56,7 +57,7 @@ namespace BandBaajaVivaah.WPF.ViewModel.Base
 
         public bool IsOnFirstPage => CurrentPage == 1;
         public bool IsOnLastPage => CurrentPage == TotalPages;
-
+        public bool IsItemSelected => SelectedItem != null;
         protected PageViewModel()
         {
             AllItems = new List<T>();

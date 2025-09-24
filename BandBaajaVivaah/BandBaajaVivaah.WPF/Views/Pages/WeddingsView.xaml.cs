@@ -55,7 +55,7 @@ namespace BandBaajaVivaah.WPF.Views.Pages
         {
             if (ViewModel?.SelectedItem != null)
             {
-                var formPage = new AddEditWeddingsView(_apiClient, _navigationService, ViewModel.SelectedWedding);
+                var formPage = new AddEditWeddingsView(_apiClient, _navigationService, ViewModel.SelectedItem);
                 _navigationService.NavigateTo(formPage);
             }
         }
