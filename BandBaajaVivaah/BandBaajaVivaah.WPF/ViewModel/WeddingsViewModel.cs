@@ -22,17 +22,6 @@ namespace BandBaajaVivaah.WPF.ViewModel
             }
         }
 
-        private WeddingDto _selectedWedding;
-        public WeddingDto SelectedWedding
-        {
-            get => _selectedWedding;
-            set
-            {
-                _selectedWedding = value;
-                OnPropertyChanged(nameof(SelectedWedding));
-            }
-        }
-
         private string _searchName;
         public string SearchName
         {
@@ -123,11 +112,6 @@ namespace BandBaajaVivaah.WPF.ViewModel
                     MessageBox.Show("Failed to delete the wedding. Please try again.");
                 }
             }
-        }
-
-        public bool CanEditOrDelete()
-        {
-            return SelectedWedding != null;
         }
     }
 }

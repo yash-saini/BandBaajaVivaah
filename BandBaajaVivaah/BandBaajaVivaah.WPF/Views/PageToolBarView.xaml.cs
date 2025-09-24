@@ -56,10 +56,18 @@ namespace BandBaajaVivaah.WPF.Views
             set { SetValue(IsLastPageProperty, value); }
         }
 
+        public static readonly DependencyProperty IsDeleteEnabledProperty =
+        DependencyProperty.Register("IsDeleteEnabled", typeof(bool), typeof(PageToolBarView), new PropertyMetadata(false));
+
+        public bool IsDeleteEnabled
+        {
+            get { return (bool)GetValue(IsDeleteEnabledProperty); }
+            set { SetValue(IsDeleteEnabledProperty, value); }
+        }
+
         public PageToolBarView()
         {
             InitializeComponent();
-            DeleteButton.IsEnabled = false;
         }
 
         private void BackButton_Click(object sender, RoutedEventArgs e)

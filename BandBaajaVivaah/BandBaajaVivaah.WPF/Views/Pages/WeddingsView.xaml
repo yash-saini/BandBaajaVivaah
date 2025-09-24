@@ -25,7 +25,8 @@
                                 CurrentPage="{Binding CurrentPage, Mode=OneWay}"
                                 TotalPages="{Binding TotalPages, Mode=OneWay}"
                                 IsFirstPage="{Binding IsOnFirstPage, Mode=OneWay}"
-                                IsLastPage="{Binding IsOnLastPage, Mode=OneWay}"/>
+                                IsLastPage="{Binding IsOnLastPage, Mode=OneWay}"
+                                IsDeleteEnabled="{Binding IsItemSelected, Mode=OneWay}"/>
 
         <TextBlock Text="My Weddings" FontSize="24" FontWeight="Bold" Margin="0,10,0,10" DockPanel.Dock="Top"/>
 
