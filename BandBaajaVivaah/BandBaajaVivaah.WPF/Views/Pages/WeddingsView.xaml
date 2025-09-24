@@ -41,9 +41,12 @@
                             <StackPanel>
                                 <TextBlock Text="Wedding Name" FontWeight="SemiBold"/>
                                 <TextBox Text="{Binding DataContext.SearchName, RelativeSource={RelativeSource AncestorType=Page}, UpdateSourceTrigger=PropertyChanged}" 
-                                         Margin="0,5,0,0"
+                                         Margin="0,0,0,0"
                                          Padding="2"
-                                         BorderThickness="1" BorderBrush="Gray"/>
+                                         MaxLength="10"
+                                         Width="100"
+                                         VerticalContentAlignment="Center"
+                                         BorderThickness="0,0,0,15" BorderBrush="Black"/>
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.HeaderTemplate>
@@ -56,15 +59,18 @@
                 
                 <DataGridTextColumn Header="Date" Binding="{Binding WeddingDate, StringFormat='d'}" Width="150"/>
                 
-                <DataGridTemplateColumn Width="150" SortMemberPath="TotalBudget">
+                <DataGridTemplateColumn Width="170" SortMemberPath="TotalBudget">
                     <DataGridTemplateColumn.HeaderTemplate>
                         <DataTemplate>
                             <StackPanel>
                                 <TextBlock Text="Budget" FontWeight="SemiBold"/>
                                 <TextBox Text="{Binding DataContext.SearchBudget, RelativeSource={RelativeSource AncestorType=Page}, UpdateSourceTrigger=PropertyChanged}" 
-                                         Margin="0,5,0,0"
+                                         Margin="0,0,0,0"
                                          Padding="2"
-                                         BorderThickness="1" BorderBrush="Gray"/>
+                                         MaxLength="10"
+                                         Width="100"
+                                         VerticalContentAlignment="Center"
+                                         BorderThickness="0,0,0,15" BorderBrush="Black"/>
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.HeaderTemplate>
