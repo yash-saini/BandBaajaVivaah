@@ -2,7 +2,7 @@
 using BandBaajaVivaah.WPF.ViewModel;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Navigation;
+using System.Windows.Media;
 using NavigationService = BandBaajaVivaah.WPF.Services.NavigationService;
 
 namespace BandBaajaVivaah.WPF.Views.Pages
@@ -78,6 +78,42 @@ namespace BandBaajaVivaah.WPF.Views.Pages
         private void Toolbar_LastPageClicked(object sender, EventArgs e)
         {
             ViewModel?.GoToLastPage();
+        }
+
+        private void DataGrid_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (e.OriginalSource is DependencyObject source)
+            {
+                var row = FindParent<DataGridRow>(source);
+
+                // If the click was not on a row (e.g., on the empty space),
+                // row will be null.
+                if (row == null)
+                {
+                    if (sender is DataGrid grid)
+                    {
+                        // Clear the selection.
+                        grid.UnselectAll();
+                    }
+                }
+            }
+        }
+
+        private static T FindParent<T>(DependencyObject child) where T : DependencyObject
+        {
+            DependencyObject parentObject = VisualTreeHelper.GetParent(child);
+
+            if (parentObject == null) return null;
+
+            T parent = parentObject as T;
+            if (parent != null)
+            {
+                return parent;
+            }
+            else
+            {
+                return FindParent<T>(parentObject);
+            }
         }
     }
 }

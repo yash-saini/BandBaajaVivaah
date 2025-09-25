@@ -13,7 +13,7 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
 
         public string Title => _editingWedding == null ? "Add New Wedding" : "Edit Wedding";
 
-        private string _weddingName;
+        private string _weddingName = string.Empty;
         public string WeddingName
         {
             get => _weddingName;
@@ -24,7 +24,7 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
             }
         }
 
-        private DateTime? _weddingDate;
+        private DateTime? _weddingDate = DateTime.Now;
         public DateTime? WeddingDate
         {
             get => _weddingDate;
@@ -35,7 +35,7 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
             }
         }
 
-        private decimal? _totalBudget;
+        private decimal? _totalBudget = 0;
         public decimal? TotalBudget
         {
             get => _totalBudget;
@@ -65,6 +65,8 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
             {
                 // ADD MODE
                 WeddingDate = DateTime.Now;
+                TotalBudget = 0;
+                WeddingName = string.Empty;
             }
         }
 

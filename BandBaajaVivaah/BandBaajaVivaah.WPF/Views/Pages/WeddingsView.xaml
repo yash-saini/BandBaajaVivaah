@@ -34,7 +34,8 @@
                   SelectedItem="{Binding SelectedItem}"
                   IsReadOnly="True"
                   Style="{StaticResource Styles.DataGrid}"
-                  MouseDoubleClick="DataGrid_MouseDoubleClick">
+                  MouseDoubleClick="DataGrid_MouseDoubleClick"
+                  PreviewMouseDown="DataGrid_PreviewMouseDown">
             <DataGrid.Columns>
                 <DataGridTemplateColumn Width="*" SortMemberPath="WeddingName">
                     <DataGridTemplateColumn.HeaderTemplate>
@@ -77,7 +78,7 @@
                     </DataGridTemplateColumn.HeaderTemplate>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding TotalBudget, StringFormat='C'}" VerticalAlignment="Center" Margin="4,0"/>
+                            <TextBlock Text="{Binding TotalBudget, StringFormat='C'}" Margin="4,0"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
