@@ -77,9 +77,9 @@ namespace BandBaajaVivaah.WPF.ViewModel
             }
 
             // Apply Budget Filter
-            if (!string.IsNullOrWhiteSpace(SearchBudget) && decimal.TryParse(SearchBudget, out var budget))
+            if (!string.IsNullOrWhiteSpace(SearchBudget))
             {
-                filtered = filtered.Where(w => w.TotalBudget >= budget);
+                filtered = filtered.Where(w => w.TotalBudget.ToString().StartsWith(SearchBudget));
             }
 
             return filtered;

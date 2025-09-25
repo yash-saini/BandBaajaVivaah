@@ -105,7 +105,7 @@ namespace BandBaajaVivaah.WPF.Views.Pages
 
             if (parentObject == null) return null;
 
-            T parent = parentObject as T;
+            T? parent = parentObject as T;
             if (parent != null)
             {
                 return parent;

@@ -78,7 +78,7 @@
                     </DataGridTemplateColumn.HeaderTemplate>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding TotalBudget, StringFormat='C'}" Margin="4,0"/>
+                            <TextBlock Text="{Binding TotalBudget, StringFormat='Rs. {0:N0}'}" Margin="4,0"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
