@@ -28,5 +28,14 @@ namespace BandBaajaVivaah.WPF.Services
                 _mainFrame.GoBack();
             }
         }
+
+        public Page? GetPreviousPage()
+        {
+            if (_mainFrame != null && _mainFrame.CanGoBack)
+            {
+                return _mainFrame.Content as Page;
+            }
+            return null;
+        }
     }
 }
