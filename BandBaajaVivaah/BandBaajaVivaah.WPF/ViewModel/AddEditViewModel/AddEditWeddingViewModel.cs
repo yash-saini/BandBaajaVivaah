@@ -48,6 +48,8 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
 
         public bool WasSuccess { get; private set; } = false;
 
+        public event Func<Task> RefreshParentRequested;
+
         public AddEditWeddingViewModel(ApiClientService apiClient, NavigationService navigationService, WeddingDto? wedding = null)
         {
             _apiClient = apiClient;
@@ -93,6 +95,7 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
             if (success)
             {
                 WasSuccess = true;
+                RefreshParentRequested?.Invoke();
                 _navigationService.GoBack();
             }
             else
