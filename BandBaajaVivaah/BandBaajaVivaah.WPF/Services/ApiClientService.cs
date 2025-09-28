@@ -298,6 +298,68 @@ namespace BandBaajaVivaah.WPF.Services
                 return false;
             }
         }
+
+        public async Task<IEnumerable<ExpenseDto>> GetExpensesAsync(int weddingId)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/expenses/wedding/{weddingId}");
+                if (response.IsSuccessStatusCode)
+                {
+                    var expenses = await response.Content.ReadFromJsonAsync<IEnumerable<ExpenseDto>>();
+                    return expenses ?? new List<ExpenseDto>();
+                }
+            }
+            catch (HttpRequestException)
+            {
+                return Enumerable.Empty<ExpenseDto>();
+            }
+            return new List<ExpenseDto>();
+        }
+
+        public async Task<ExpenseDto?> CreateExpenseAsync(CreateExpenseDto createDto)
+        {
+            try
+            {
+                var response = await _httpClient.PostAsJsonAsync("api/expenses", createDto);
+                if (response.IsSuccessStatusCode)
+                {
+                    var expense = await response.Content.ReadFromJsonAsync<ExpenseDto>();
+                    return expense;
+                }
+            }
+            catch (HttpRequestException)
+            {
+                return null;
+            }
+            return null;
+        }
+
+        public async Task<bool> UpdateExpenseAsync(int expenseId, CreateExpenseDto updateDto)
+        {
+            try
+            {
+                var response = await _httpClient.PutAsJsonAsync($"api/expenses/{expenseId}", updateDto);
+                return response.IsSuccessStatusCode;
+            }
+            catch (HttpRequestException)
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> DeleteExpenseAsync(int expenseId)
+        {
+            try
+            {
+                var response = await _httpClient.DeleteAsync($"api/expenses/{expenseId}");
+                return response.IsSuccessStatusCode;
+            }
+            catch (HttpRequestException)
+            {
+                return false;
+            }
+        }
     }
 
     /// <summary>
