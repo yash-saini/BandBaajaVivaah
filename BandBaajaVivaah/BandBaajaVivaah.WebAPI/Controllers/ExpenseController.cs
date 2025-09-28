@@ -58,5 +58,30 @@ namespace BandBaajaVivaah.Api.Controllers
                 return Forbid(ex.Message);
             }
         }
+
+        [HttpPut("{expenseId}")]
+        public async Task<IActionResult> UpdateExpense(int expenseId, [FromBody] CreateExpenseDto expenseDto)
+        {
+
+            var userId = GetCurrentUserId();
+            var updatedExpense = await _expenseService.UpdateExpenseAsync(expenseId, expenseDto, userId);
+            if (!updatedExpense)
+            {
+                return NotFound();
+            }
+            return NoContent();
+        }
+
+        [HttpDelete("{expenseId}")]
+        public async Task<IActionResult> DeleteExpense(int expenseId)
+        {
+            var userId = GetCurrentUserId();
+            var deleted = await _expenseService.DeleteExpenseAsync(expenseId, userId);
+            if (!deleted)
+            {
+                return NotFound();
+            }
+            return NoContent();
+        }
     }
 }

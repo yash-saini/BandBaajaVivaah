@@ -98,7 +98,8 @@ namespace BandBaajaVivaah.WPF.ViewModel
         {
             if (obj is WeddingDto wedding)
             {
-                MessageBox.Show("Navigate to Expenses Page for wedding: " + wedding.WeddingName);
+                var expensePage = new ExpensesView(_apiClient, _navigationService, wedding.WeddingID);
+                _navigationService.NavigateTo(expensePage);
             }
         }
 
