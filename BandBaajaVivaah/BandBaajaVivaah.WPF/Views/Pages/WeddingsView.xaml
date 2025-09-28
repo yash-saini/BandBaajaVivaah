@@ -5,7 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:BandBaajaVivaah.WPF.Views.Pages"
       xmlns:views="clr-namespace:BandBaajaVivaah.WPF.Views"
-      xmlns:vm="clr-namespace:BandBaajaVivaah.WPF.ViewModel"
+      xmlns:vm="clr-namespace:BandBaajaVivaah.WPF.ViewModel" xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="WeddingsView"
@@ -79,6 +79,33 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding TotalBudget, StringFormat='Rs. {0:N0}'}" Margin="4,0"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="Actions" Width="*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Button ToolTip="Manage Guests" 
+                                        Style="{StaticResource Styles.Button}"
+                                        Command="{Binding DataContext.ManageGuestsCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                        CommandParameter="{Binding}">
+                                    <iconPacks:PackIconMaterial Kind="AccountGroup" />
+                                </Button>
+                                <Button ToolTip="Manage Tasks" Margin="5,0,0,0"
+                                        Style="{StaticResource Styles.Button}"
+                                        Command="{Binding DataContext.ManageTasksCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                        CommandParameter="{Binding}">
+                                    <iconPacks:PackIconMaterial Kind="BookOpenBlankVariant" />
+                                </Button>
+                                <Button ToolTip="Manage Expenses" Margin="5,0,0,0"
+                                        Style="{StaticResource Styles.Button}"
+                                        Command="{Binding DataContext.ManageExpensesCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                        CommandParameter="{Binding}">
+                                    <iconPacks:PackIconMaterial Kind="CurrencyRupee" />
+                                </Button>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
