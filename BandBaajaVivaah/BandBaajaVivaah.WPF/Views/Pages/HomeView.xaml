@@ -20,27 +20,6 @@
                     <Label Content="My Weddings" FontSize="20" Margin="0,10,0,0" Style="{StaticResource Styles.Label}"/>
                 </StackPanel>
             </Button>
-
-            <Button Style="{StaticResource Styles.DashboardTileButton}" Command="{Binding NavigateToTasksCommand}">
-                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <iconPacks:PackIconMaterial Kind="ClipboardListOutline" Width="60" Height="60"/>
-                    <Label Content="Manage Tasks" FontSize="20" Margin="0,10,0,0" Style="{StaticResource Styles.Label}"/>
-                </StackPanel>
-            </Button>
-
-            <Button Style="{StaticResource Styles.DashboardTileButton}" Command="{Binding NavigateToGuestsCommand}">
-                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <iconPacks:PackIconMaterial Kind="AccountGroupOutline" Width="60" Height="60"/>
-                    <Label Content="Guest List" FontSize="20" Margin="0,10,0,0" Style="{StaticResource Styles.Label}"/>
-                </StackPanel>
-            </Button>
-
-            <Button Style="{StaticResource Styles.DashboardTileButton}" Command="{Binding NavigateToExpensesCommand}">
-                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Width="200">
-                    <iconPacks:PackIconMaterial Kind="CashMultiple" Width="60" Height="60"/>
-                    <Label Content="Budget &amp; Expenses" FontSize="20" Margin="0,10,0,0" Style="{StaticResource Styles.Label}"/>
-                </StackPanel>
-            </Button>
         </WrapPanel>
     </StackPanel>
 </Page>

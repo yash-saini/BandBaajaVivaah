@@ -8,6 +8,8 @@ namespace BandBaajaVivaah.Services
     {
         Task<IEnumerable<GuestDto>> GetGuestsByWeddingIdAsync(int weddingId, int userId);
         Task<GuestDto> CreateGuestAsync(CreateGuestDto guestDto, int userId);
+        Task<bool> UpdateGuestAsync(int guestId, CreateGuestDto updateDto, int userId);
+        Task<bool> DeleteGuestAsync(int guestId, int userId);
     }
 
     public class GuestService : IGuestService
@@ -66,6 +68,43 @@ namespace BandBaajaVivaah.Services
                 Side = g.Side,
                 RSVPStatus = g.Rsvpstatus
             });
+        }
+
+        public async Task<bool> UpdateGuestAsync(int guestId, CreateGuestDto updateDto, int userId)
+        {
+            var guest = await _unitOfWork.Guests.GetByIdAsync(guestId);
+            if (guest == null)
+            {
+                return false;
+            }
+            var wedding = await _unitOfWork.Weddings.GetByIdAsync(guest.WeddingId);
+            if (wedding == null || wedding.OwnerUserId != userId)
+            {
+                return false;
+            }
+            guest.FirstName = updateDto.FirstName;
+            guest.LastName = updateDto.LastName;
+            guest.Side = updateDto.Side;
+            guest.Rsvpstatus = updateDto.RSVPStatus;
+            await _unitOfWork.CompleteAsync();
+            return true;
+        }
+
+        public async Task<bool> DeleteGuestAsync(int guestId, int userId)
+        {
+            var guest = await _unitOfWork.Guests.GetByIdAsync(guestId);
+            if (guest == null)
+            {
+                return false;
+            }
+            var wedding = await _unitOfWork.Weddings.GetByIdAsync(guest.WeddingId);
+            if (wedding == null || wedding.OwnerUserId != userId)
+            {
+                return false;
+            }
+            await _unitOfWork.Guests.DeleteAsync(guestId);
+            await _unitOfWork.CompleteAsync();
+            return true;
         }
     }
 }

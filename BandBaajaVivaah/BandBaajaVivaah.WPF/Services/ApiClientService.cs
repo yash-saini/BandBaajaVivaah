@@ -144,6 +144,19 @@ namespace BandBaajaVivaah.WPF.Services
             }
         }
 
+        public async Task<bool> DeleteGuestAsync(int guestId)
+        {
+            try
+            {
+                var response = await _httpClient.DeleteAsync($"api/guests/{guestId}");
+                return response.IsSuccessStatusCode;
+            }
+            catch (HttpRequestException)
+            {
+                return false;
+            }
+        }
+
         public async Task<WeddingDto?> CreateWeddingAsync(CreateWeddingDto createDto)
         {
             try
@@ -167,6 +180,55 @@ namespace BandBaajaVivaah.WPF.Services
             try
             {
                 var response = await _httpClient.PutAsJsonAsync($"api/weddings/{weddingId}", updateDto);
+                return response.IsSuccessStatusCode;
+            }
+            catch (HttpRequestException)
+            {
+                return false;
+            }
+        }
+
+        public async Task<IEnumerable<GuestDto>> GetGuestsAsync(int weddingId)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/guests/wedding/{weddingId}");
+                if (response.IsSuccessStatusCode)
+                {
+                    var guests = await response.Content.ReadFromJsonAsync<IEnumerable<GuestDto>>();
+                    return guests ?? new List<GuestDto>();
+                }
+            }
+            catch (HttpRequestException)
+            {
+                return Enumerable.Empty<GuestDto>();
+            }
+            return new List<GuestDto>();
+        }
+
+        public async Task<GuestDto?> CreateGuestAsync(CreateGuestDto createDto)
+        {
+            try
+            {
+                var response = await _httpClient.PostAsJsonAsync("api/guests", createDto);
+                if (response.IsSuccessStatusCode)
+                {
+                    var guest = await response.Content.ReadFromJsonAsync<GuestDto>();
+                    return guest;
+                }
+            }
+            catch (HttpRequestException)
+            {
+                return null;
+            }
+            return null;
+        }
+
+        public async Task<bool> UpdateGuestAsync(int guestId, CreateGuestDto updateDto)
+        {
+            try
+            {
+                var response = await _httpClient.PutAsJsonAsync($"api/guests/{guestId}", updateDto);
                 return response.IsSuccessStatusCode;
             }
             catch (HttpRequestException)

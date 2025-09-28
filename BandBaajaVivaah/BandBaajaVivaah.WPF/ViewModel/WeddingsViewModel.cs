@@ -1,8 +1,11 @@
 ﻿using BandBaajaVivaah.Contracts.DTOs;
+using BandBaajaVivaah.WPF.Commands;
 using BandBaajaVivaah.WPF.Services;
 using BandBaajaVivaah.WPF.ViewModel.Base;
+using BandBaajaVivaah.WPF.Views.Pages;
 using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Input;
 
 namespace BandBaajaVivaah.WPF.ViewModel
 {
@@ -10,6 +13,9 @@ namespace BandBaajaVivaah.WPF.ViewModel
     {
         private readonly ApiClientService _apiClient;
         private readonly NavigationService _navigationService;
+        public ICommand ManageGuestsCommand { get; }
+        public ICommand ManageTasksCommand { get; }
+        public ICommand ManageExpensesCommand { get; }
 
         private ObservableCollection<WeddingDto> _weddings;
         public ObservableCollection<WeddingDto> Weddings
@@ -52,6 +58,10 @@ namespace BandBaajaVivaah.WPF.ViewModel
         {
             _apiClient = apiClient;
             _navigationService = navigationService;
+            ManageGuestsCommand = new RelayCommand(NavigateToGuests);
+            ManageTasksCommand = new RelayCommand(NavigateToTasks);
+            ManageExpensesCommand = new RelayCommand(NavigateToExpenses);
+
             LoadDataAsync();
         }
 
@@ -63,6 +73,31 @@ namespace BandBaajaVivaah.WPF.ViewModel
                 AllItems = weddingsList.ToList(); // Setting the base class's master list
                 CurrentPage = 1;
                 UpdateDisplayedItems(); // Refreshing the view
+            }
+        }
+
+        private void NavigateToGuests(object obj)
+        {
+            if (obj is WeddingDto wedding)
+            {
+                var guestPage = new GuestsView(_apiClient, _navigationService, wedding.WeddingID);
+                _navigationService.NavigateTo(guestPage);
+            }
+        }
+
+        private void NavigateToTasks(object obj)
+        {
+            if (obj is WeddingDto wedding)
+            {
+                MessageBox.Show("Navigate to Tasks Page for wedding: " + wedding.WeddingName);
+            }
+        }
+
+        private void NavigateToExpenses(object obj)
+        {
+            if (obj is WeddingDto wedding)
+            {
+                MessageBox.Show("Navigate to Expenses Page for wedding: " + wedding.WeddingName);
             }
         }
 
