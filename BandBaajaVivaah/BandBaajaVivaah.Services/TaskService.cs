@@ -7,6 +7,8 @@ namespace BandBaajaVivaah.Services
     {
         Task<IEnumerable<TaskDto>> GetTasksByWeddingIdAsync(int weddingId, int userId);
         Task<TaskDto> CreateTaskAsync(CreateTaskDto taskDto, int userId);
+        Task<bool> UpdateTaskAsync(int taskId, CreateTaskDto taskDto, int userId);
+        Task<bool> DeleteTaskAsync(int taskId, int userId);
     }
 
     public class TaskService : ITaskService
@@ -27,10 +29,13 @@ namespace BandBaajaVivaah.Services
                 throw new UnauthorizedAccessException("You are not authorized to add a task to this wedding.");
             }
 
-            var task = new BandBaaajaVivaah.Data.Models.Task // 'Task' now resolves correctly to BandBaajaVivaah.Models.Task
+            var task = new BandBaaajaVivaah.Data.Models.Task
             {
                 Title = taskDto.Title,
-                WeddingId = taskDto.WeddingID
+                WeddingId = taskDto.WeddingID,
+                Description = taskDto.Description,
+                DueDate = taskDto.DueDate,
+                Status = taskDto.Status,
             };
 
             await _unitOfWork.Tasks.AddAsync(task);
@@ -40,7 +45,9 @@ namespace BandBaajaVivaah.Services
             {
                 TaskID = task.TaskId,
                 Title = task.Title,
-                Status = task.Status
+                Status = task.Status,
+                Description = task.Description,
+                DueDate = task.DueDate,
             };
         }
 
@@ -57,8 +64,48 @@ namespace BandBaajaVivaah.Services
             {
                 TaskID = t.TaskId,
                 Title = t.Title,
-                Status = t.Status
+                Status = t.Status,
+                Description = t.Description,
+                DueDate = t.DueDate
             });
+        }
+
+        public async Task<bool> UpdateTaskAsync(int taskId, CreateTaskDto taskDto, int userId)
+        {
+            var task = await _unitOfWork.Tasks.GetByIdAsync(taskId);
+            if (task == null)
+            {
+                return false;
+            }
+            var wedding = await _unitOfWork.Weddings.GetByIdAsync(task.WeddingId);
+            if (wedding == null || wedding.OwnerUserId != userId)
+            {
+                return false;
+            }
+            task.Title = taskDto.Title;
+            task.Description = taskDto.Description;
+            task.DueDate = taskDto.DueDate;
+            task.Status = taskDto.Status;
+
+            await _unitOfWork.CompleteAsync();
+            return true;
+        }
+
+        public async Task<bool> DeleteTaskAsync(int taskId, int userId)
+        {
+            var task = await _unitOfWork.Tasks.GetByIdAsync(taskId);
+            if (task == null)
+            {
+                return false;
+            }
+            var wedding = await _unitOfWork.Weddings.GetByIdAsync(task.WeddingId);
+            if (wedding == null || wedding.OwnerUserId != userId)
+            {
+                return false;
+            }
+            await _unitOfWork.Tasks.DeleteAsync(taskId);
+            await _unitOfWork.CompleteAsync();
+            return true;
         }
     }
 }

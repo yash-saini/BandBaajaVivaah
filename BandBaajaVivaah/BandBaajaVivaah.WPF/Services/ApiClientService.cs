@@ -157,6 +157,19 @@ namespace BandBaajaVivaah.WPF.Services
             }
         }
 
+        public async Task<bool> DeleteTaskAsync(int taskId)
+        {
+            try
+            {
+                var response = await _httpClient.DeleteAsync($"api/tasks/{taskId}");
+                return response.IsSuccessStatusCode;
+            }
+            catch (HttpRequestException)
+            {
+                return false;
+            }
+        }
+
         public async Task<WeddingDto?> CreateWeddingAsync(CreateWeddingDto createDto)
         {
             try
@@ -206,6 +219,24 @@ namespace BandBaajaVivaah.WPF.Services
             return new List<GuestDto>();
         }
 
+        public async Task<IEnumerable<TaskDto>> GetTasksAsync(int weddingId)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/tasks/wedding/{weddingId}");
+                if (response.IsSuccessStatusCode)
+                {
+                    var tasks = await response.Content.ReadFromJsonAsync<IEnumerable<TaskDto>>();
+                    return tasks ?? new List<TaskDto>();
+                }
+            }
+            catch (HttpRequestException)
+            {
+                return [];
+            }
+            return [];
+        }
+
         public async Task<GuestDto?> CreateGuestAsync(CreateGuestDto createDto)
         {
             try
@@ -224,6 +255,24 @@ namespace BandBaajaVivaah.WPF.Services
             return null;
         }
 
+        public async Task<TaskDto?> CreateTaskAsync(CreateTaskDto createDto)
+        {
+            try
+            {
+                var response = await _httpClient.PostAsJsonAsync("api/tasks", createDto);
+                if (response.IsSuccessStatusCode)
+                {
+                    var task = await response.Content.ReadFromJsonAsync<TaskDto>();
+                    return task;
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                return null;
+            }
+            return null;
+        }
+
         public async Task<bool> UpdateGuestAsync(int guestId, CreateGuestDto updateDto)
         {
             try
@@ -232,6 +281,19 @@ namespace BandBaajaVivaah.WPF.Services
                 return response.IsSuccessStatusCode;
             }
             catch (HttpRequestException)
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateTaskAsync(int taskId, CreateTaskDto updateDto)
+        {
+            try
+            {
+                var response = await _httpClient.PutAsJsonAsync($"api/tasks/{taskId}", updateDto);
+                return response.IsSuccessStatusCode;
+            }
+            catch (HttpRequestException ex)
             {
                 return false;
             }
