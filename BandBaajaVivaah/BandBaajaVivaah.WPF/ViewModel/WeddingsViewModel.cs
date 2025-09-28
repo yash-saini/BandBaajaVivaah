@@ -89,7 +89,8 @@ namespace BandBaajaVivaah.WPF.ViewModel
         {
             if (obj is WeddingDto wedding)
             {
-                MessageBox.Show("Navigate to Tasks Page for wedding: " + wedding.WeddingName);
+                var taskPage = new TasksView(_apiClient, _navigationService, wedding.WeddingID);
+                _navigationService.NavigateTo(taskPage);
             }
         }
 

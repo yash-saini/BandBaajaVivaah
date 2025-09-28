@@ -1,7 +1,8 @@
 ﻿using BandBaajaVivaah.Contracts.DTOs;
-using BandBaajaVivaah.Services; // Assuming you create an ITaskService
+using BandBaajaVivaah.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace BandBaajaVivaah.Api.Controllers;
 
@@ -10,29 +11,85 @@ namespace BandBaajaVivaah.Api.Controllers;
 [ApiController]
 public class TasksController : ControllerBase
 {
-    // We will create an ITaskService similar to how we created IUserService
-    //private readonly ITaskService _taskService;
+    private readonly ITaskService _taskService;
+    public TasksController(ITaskService taskService)
+    {
+        _taskService = taskService;
+    }
+    private int GetCurrentUserId()
+    {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userIdClaim))
+        {
+            throw new InvalidOperationException("User ID claim is missing.");
+        }
+        return int.Parse(userIdClaim);
+    }
 
-    //public TasksController(ITaskService taskService)
-    //{
-    //    _taskService = taskService;
-    //}
+    [HttpGet("wedding/{weddingId}")]
+    public async Task<IActionResult> GetTasksForWedding(int weddingId)
+    {
+        try
+        {
+            var userId = GetCurrentUserId();
+            var tasks = await _taskService.GetTasksByWeddingIdAsync(weddingId, userId);
+            return Ok(tasks);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Forbid();
+        }
+    }
+    [HttpPost]
+    public async Task<IActionResult> CreateTask([FromBody] CreateTaskDto taskDto)
+    {
+        try
+        {
+            var userId = GetCurrentUserId();
+            var createdTask = await _taskService.CreateTaskAsync(taskDto, userId);
+            return Ok(createdTask);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Forbid(ex.Message);
+        }
+    }
 
-   // GET: api/tasks/wedding/5
-   // [HttpGet("wedding/{weddingId}")]
-   // public async Task<IActionResult> GetTasksForWedding(int weddingId)
-   // {
-   //     You would add logic here to ensure the logged -in user owns this wedding
-   //    var tasks = await _taskService.GetTasksByWeddingIdAsync(weddingId);
-   //     return Ok(tasks);
-   // }
+    [HttpPut("{taskId}")]
+    public async Task<IActionResult> UpdateTask(int taskId, [FromBody] CreateTaskDto updateDto)
+    {
+        try
+        {
+            var userId = GetCurrentUserId();
+            var success = await _taskService.UpdateTaskAsync(taskId, updateDto, userId);
+            if (!success)
+            {
+                return NotFound();
+            }
+            return NoContent();
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Forbid(ex.Message);
+        }
+    }
 
-   // POST: api/tasks
-   //[HttpPost]
-   // public async Task<IActionResult> CreateTask([FromBody] CreateTaskDto taskDto)
-   // {
-   //     Add ownership validation here as well
-   //     var newTask = await _taskService.CreateTaskAsync(taskDto);
-   //     return CreatedAtAction(nameof(GetTasksForWedding), new { weddingId = newTask.WeddingID }, newTask);
-   // }
+    [HttpDelete("{taskId}")]
+    public async Task<IActionResult> DeleteTask(int taskId)
+    {
+        try
+        {
+            var userId = GetCurrentUserId();
+            var success = await _taskService.DeleteTaskAsync(taskId, userId);
+            if (!success)
+            {
+                return NotFound();
+            }
+            return NoContent();
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Forbid(ex.Message);
+        }
+    }
 }

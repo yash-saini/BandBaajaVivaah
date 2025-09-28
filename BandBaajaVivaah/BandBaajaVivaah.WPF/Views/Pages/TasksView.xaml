@@ -4,11 +4,114 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:BandBaajaVivaah.WPF.Views.Pages"
+      xmlns:views="clr-namespace:BandBaajaVivaah.WPF.Views"
+      xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="TasksView">
+      Title="TasksView" Background="White">
+    <DockPanel Margin="10">
+        <views:PageToolBarView DockPanel.Dock="Top"
+                                BackButtonClicked="Toolbar_BackButtonClicked"
+                                AddButtonClicked="Toolbar_AddButtonClicked"
+                                DeleteButtonClicked="Toolbar_DeleteButtonClicked"
+                                RefreshButtonClicked="PageToolBarView_RefreshButtonClicked"
+                                FirstPageClicked="Toolbar_FirstPageClicked"
+                                PreviousPageClicked="Toolbar_PreviousPageClicked"
+                                NextPageClicked="Toolbar_NextPageClicked"
+                                LastPageClicked="Toolbar_LastPageClicked"
+                                CurrentPage="{Binding CurrentPage, Mode=OneWay}"
+                                TotalPages="{Binding TotalPages, Mode=OneWay}"
+                                IsFirstPage="{Binding IsOnFirstPage, Mode=OneWay}"
+                                IsLastPage="{Binding IsOnLastPage, Mode=OneWay}"
+                                IsDeleteEnabled="{Binding IsItemSelected, Mode=OneWay}"/>
 
-    <Grid>
-        <Label Content="Tasks Page" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center" Style="{StaticResource Styles.Label}"/>
-    </Grid>
+        <TextBlock Text="Task List" FontSize="24" FontWeight="Bold" Margin="0,10,0,10" DockPanel.Dock="Top"/>
+        <DataGrid ItemsSource="{Binding DisplayedItems}" 
+                  SelectedItem="{Binding SelectedItem}"
+                  IsReadOnly="True"
+                  Style="{StaticResource Styles.DataGrid}"
+                  MouseDoubleClick="DataGrid_MouseDoubleClick"
+                  PreviewMouseDown="DataGrid_PreviewMouseDown">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Width="*" SortMemberPath="Title">
+                    <DataGridTemplateColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="Title" FontWeight="SemiBold"/>
+                                <TextBox Text="{Binding DataContext.SearchTitle, RelativeSource={RelativeSource AncestorType=Page}, UpdateSourceTrigger=PropertyChanged}" 
+                                         Margin="0,0,0,0"
+                                         Padding="2"
+                                         MaxLength="20"
+                                         Width="100"
+                                         VerticalContentAlignment="Center"
+                                         BorderThickness="0,0,0,15" BorderBrush="Black"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.HeaderTemplate>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Title}" VerticalAlignment="Center" Margin="4,0"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Width="*" SortMemberPath="Description">
+                    <DataGridTemplateColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="Description" FontWeight="SemiBold"/>
+                                <TextBox Text="{Binding DataContext.Description, RelativeSource={RelativeSource AncestorType=Page}, UpdateSourceTrigger=PropertyChanged}" 
+                                         Margin="0,0,0,0"
+                                         Padding="2"
+                                         MaxLength="20"
+                                         Width="100"
+                                         VerticalContentAlignment="Center"
+                                         BorderThickness="0,0,0,15" BorderBrush="Black"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.HeaderTemplate>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Description}" VerticalAlignment="Center" Margin="4,0"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Width="170" SortMemberPath="DueDate">
+                    <DataGridTemplateColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="Due Date" FontWeight="SemiBold"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.HeaderTemplate>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding DueDate, StringFormat=MM/dd/yyyy}" VerticalAlignment="Center" Margin="4,0"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Width="170" SortMemberPath="Status">
+                    <DataGridTemplateColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="Status" FontWeight="SemiBold"/>
+                                <TextBox Text="{Binding DataContext.Status, RelativeSource={RelativeSource AncestorType=Page}, UpdateSourceTrigger=PropertyChanged}" 
+                                         Margin="0,0,0,0"
+                                         Padding="2"
+                                         MaxLength="15"
+                                         Width="100"
+                                         VerticalContentAlignment="Center"
+                                         BorderThickness="0,0,0,15" BorderBrush="Black"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.HeaderTemplate>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Status}" VerticalAlignment="Center" Margin="4,0"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
 </Page>
