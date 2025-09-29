@@ -2,7 +2,6 @@
 using BandBaajaVivaah.WPF.Services;
 using BandBaajaVivaah.WPF.ViewModel.Base;
 using System.Collections.ObjectModel;
-using System.Windows;
 
 namespace BandBaajaVivaah.WPF.ViewModel
 {
@@ -11,6 +10,8 @@ namespace BandBaajaVivaah.WPF.ViewModel
         private readonly ApiClientService _apiClient;
         private readonly NavigationService _navigationService;
         private readonly int _weddingId;
+        public event EventHandler<string> ShowMessageRequested;
+        public event EventHandler<(string Message, string Title, Action<bool> Callback)> ShowConfirmationRequested;
 
         private ObservableCollection<ExpenseDto> _expenses;
         public ObservableCollection<ExpenseDto> Expenses
@@ -109,26 +110,30 @@ namespace BandBaajaVivaah.WPF.ViewModel
         {
             if (SelectedItem == null)
             {
-                MessageBox.Show("Please select an expense to delete.");
+                ShowMessageRequested?.Invoke(this, "Please select an expense to delete.");
                 return;
             }
 
-            var result = MessageBox.Show($"Are you sure you want to delete the expense '{SelectedItem.Description}'?",
-                                       "Confirm Delete", MessageBoxButton.YesNo);
-
-            if (result == MessageBoxResult.Yes)
-            {
-                var success = await _apiClient.DeleteExpenseAsync(SelectedItem.ExpenseID);
-                if (success)
-                {
-                    await LoadDataAsync(); // Reload all data
-                    SelectedItem = null;
-                }
-                else
-                {
-                    MessageBox.Show("Failed to delete the expense. Please try again.");
-                }
-            }
+            ShowConfirmationRequested?.Invoke(this,
+                ($"Are you sure you want to delete the expense '{SelectedItem.Description}'?",
+                 "Confirm Delete",
+                 async (confirmed) =>
+                 {
+                     if (confirmed)
+                     {
+                         var success = await _apiClient.DeleteExpenseAsync(SelectedItem.ExpenseID);
+                         if (success)
+                         {
+                             await LoadDataAsync();
+                             SelectedItem = null;
+                         }
+                         else
+                         {
+                             ShowMessageRequested?.Invoke(this, "Failed to delete the expense. Please try again.");
+                         }
+                     }
+                 }
+            ));
         }
     }
 }

@@ -1,13 +1,7 @@
 ﻿using BandBaajaVivaah.Contracts.DTOs;
 using BandBaajaVivaah.WPF.Services;
 using BandBaajaVivaah.WPF.ViewModel.Base;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 
 namespace BandBaajaVivaah.WPF.ViewModel
 {
@@ -16,6 +10,9 @@ namespace BandBaajaVivaah.WPF.ViewModel
         private readonly ApiClientService _apiClient;
         private readonly NavigationService _navigationService;
         private readonly int _weddingId;
+
+        public event EventHandler<string> ShowMessageRequested;
+        public event EventHandler<(string Message, string Title, Action<bool> Callback)> ShowConfirmationRequested;
 
         private ObservableCollection<TaskDto> _tasks;
         public ObservableCollection<TaskDto> Tasks
@@ -125,26 +122,30 @@ namespace BandBaajaVivaah.WPF.ViewModel
         {
             if (SelectedItem == null)
             {
-                MessageBox.Show("Please select a task to delete.");
+                ShowMessageRequested?.Invoke(this, "Please select a task to delete.");
                 return;
             }
 
-            var result = MessageBox.Show($"Are you sure you want to delete the task '{SelectedItem.Title}'?",
-                                       "Confirm Delete", MessageBoxButton.YesNo);
-
-            if (result == MessageBoxResult.Yes)
-            {
-                var success = await _apiClient.DeleteTaskAsync(SelectedItem.TaskID);
-                if (success)
-                {
-                    await LoadDataAsync(); // Reload all data
-                    SelectedItem = null;
-                }
-                else
-                {
-                    MessageBox.Show("Failed to delete the task. Please try again.");
-                }
-            }
+            ShowConfirmationRequested?.Invoke(this,
+                ($"Are you sure you want to delete the task '{SelectedItem.Title}'?",
+                 "Confirm Delete",
+                 async (confirmed) =>
+                 {
+                     if (confirmed)
+                     {
+                         var success = await _apiClient.DeleteTaskAsync(SelectedItem.TaskID);
+                         if (success)
+                         {
+                             await LoadDataAsync(); // Reload all data
+                             SelectedItem = null;
+                         }
+                         else
+                         {
+                             ShowMessageRequested?.Invoke(this, "Failed to delete the task. Please try again.");
+                         }
+                     }
+                 }
+            ));
         }
     }
 }
