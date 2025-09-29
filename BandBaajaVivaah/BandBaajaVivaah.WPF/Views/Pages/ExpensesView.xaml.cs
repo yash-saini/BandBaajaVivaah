@@ -23,7 +23,23 @@ namespace BandBaajaVivaah.WPF.Views.Pages
             _apiClient = apiClient;
             _navigationService = navigationService;
             _weddingId = weddingId;
-            DataContext = new ExpensesViewModel(apiClient, navigationService, weddingId);
+            var viewModel = new ExpensesViewModel(apiClient, navigationService, weddingId);
+
+            viewModel.ShowMessageRequested += ViewModel_ShowMessageRequested;
+            viewModel.ShowConfirmationRequested += ViewModel_ShowConfirmationRequested;
+
+            DataContext = viewModel;
+        }
+
+        private void ViewModel_ShowMessageRequested(object? sender, string message)
+        {
+            MessageBox.Show(message);
+        }
+
+        private void ViewModel_ShowConfirmationRequested(object? sender, (string Message, string Title, Action<bool> Callback) data)
+        {
+            var result = MessageBox.Show(data.Message, data.Title, MessageBoxButton.YesNo);
+            data.Callback(result == MessageBoxResult.Yes);
         }
 
         private void Toolbar_BackButtonClicked(object sender, EventArgs e)

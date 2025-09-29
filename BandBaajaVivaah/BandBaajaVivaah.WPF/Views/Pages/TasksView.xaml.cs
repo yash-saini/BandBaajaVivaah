@@ -20,10 +20,24 @@ namespace BandBaajaVivaah.WPF.Views.Pages
         public TasksView(ApiClientService apiClient, NavigationService navigationService, int weddingId)
         {
             InitializeComponent();
-            DataContext = new TasksViewModel(apiClient, navigationService, weddingId);
             _apiClient = apiClient;
             _weddingId = weddingId;
             _navigationService = navigationService;
+            var viewModel = new TasksViewModel(_apiClient, _navigationService, weddingId);
+            viewModel.ShowMessageRequested += ViewModel_ShowMessageRequested;
+            viewModel.ShowConfirmationRequested += ViewModel_ShowConfirmationRequested;
+            DataContext = viewModel;
+        }
+
+        private void ViewModel_ShowMessageRequested(object? sender, string message)
+        {
+            MessageBox.Show(message);
+        }
+
+        private void ViewModel_ShowConfirmationRequested(object? sender, (string Message, string Title, Action<bool> Callback) data)
+        {
+            var result = MessageBox.Show(data.Message, data.Title, MessageBoxButton.YesNo);
+            data.Callback(result == MessageBoxResult.Yes);
         }
 
         private void Toolbar_BackButtonClicked(object sender, System.EventArgs e)

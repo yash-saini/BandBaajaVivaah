@@ -17,6 +17,9 @@ namespace BandBaajaVivaah.WPF.ViewModel
         public ICommand ManageTasksCommand { get; }
         public ICommand ManageExpensesCommand { get; }
 
+        public event EventHandler<string> ShowMessageRequested;
+        public event EventHandler<(string Message, string Title, Action<bool> Callback)> ShowConfirmationRequested;
+
         private ObservableCollection<WeddingDto> _weddings;
         public ObservableCollection<WeddingDto> Weddings
         {
@@ -132,23 +135,30 @@ namespace BandBaajaVivaah.WPF.ViewModel
         {
             if (SelectedItem == null)
             {
-                MessageBox.Show("Please select a wedding to delete.");
+                ShowMessageRequested?.Invoke(this, "Please select a wedding to delete.");
                 return;
             }
-            var result = MessageBox.Show($"Are you sure you want to delete the wedding - {SelectedItem.WeddingName}?", "Confirm Delete", MessageBoxButton.YesNo);
-            if (result == MessageBoxResult.Yes)
-            {
-                var success = await _apiClient.DeleteWeddingAsync(SelectedItem.WeddingID);
-                if (success)
-                {
-                    await LoadDataAsync(); // Reload all data
-                    SelectedItem = null;
-                }
-                else
-                {
-                    MessageBox.Show("Failed to delete the wedding. Please try again.");
-                }
-            }
+
+            ShowConfirmationRequested?.Invoke(this,
+                ($"Are you sure you want to delete the wedding - {SelectedItem.WeddingName}?",
+                 "Confirm Delete",
+                 async (confirmed) =>
+                 {
+                     if (confirmed)
+                     {
+                         var success = await _apiClient.DeleteWeddingAsync(SelectedItem.WeddingID);
+                         if (success)
+                         {
+                             await LoadDataAsync(); // Reload all data
+                             SelectedItem = null;
+                         }
+                         else
+                         {
+                             ShowMessageRequested?.Invoke(this, "Failed to delete the wedding. Please try again.");
+                         }
+                     }
+                 }
+            ));
         }
     }
 }

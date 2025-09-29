@@ -123,7 +123,7 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
             }
             else
             {
-                MessageBox.Show("Failed to save. Please try again.");
+                await Task.CompletedTask;
             }
         }
     }
