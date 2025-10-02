@@ -1,16 +1,19 @@
 ﻿using BandBaajaVivaah.Contracts.DTO;
 using BandBaajaVivaah.WPF.Services;
 using BandBaajaVivaah.WPF.ViewModel.Base;
-using System.Windows;
 
 namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
 {
-    public class AddEditExpensesViewModel : ViewModelBase
+    public class AddEditExpensesViewModel : ValidatableViewModelBase
     {
         private readonly ApiClientService _apiClient;
         private readonly NavigationService _navigationService;
         private readonly ExpenseDto? _editingExpense;
         private readonly int _weddingId;
+
+        private bool _formSubmitAttempted = false;
+
+        public bool ShowValidationSummary => _formSubmitAttempted && HasErrors;
 
         public string Title => _editingExpense == null ? "Add New Expense" : "Edit Expense";
 
@@ -22,17 +25,32 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
             {
                 _description = value;
                 OnPropertyChanged(nameof(Description));
+                if (_formSubmitAttempted)
+                    ValidateDescription();
             }
         }
 
         private decimal? _amount=0;
-        public decimal? Amount
+        private string _amountText = "0";
+        public string AmountText
         {
-            get => _amount;
+            get => _amountText;
             set
             {
-                _amount = value;
-                OnPropertyChanged(nameof(Amount));
+                _amountText = value;
+                OnPropertyChanged(nameof(AmountText));
+
+                // Try to parse the string. If it fails, the value is invalid (null).
+                if (decimal.TryParse(value, out decimal parsedAmount))
+                {
+                    _amount = parsedAmount;
+                }
+                else
+                {
+                    _amount = null; // Invalid input like "abc" or empty string
+                }
+
+                if (_formSubmitAttempted) ValidateAmount();
             }
         }
 
@@ -55,8 +73,12 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
             {
                 _paymentDate = value;
                 OnPropertyChanged(nameof(PaymentDate));
+                if (_formSubmitAttempted)
+                    ValidateDate();
             }
         }
+
+        public bool CanSave => !HasErrors;
 
         public bool WasSuccess { get; private set; } = false;
 
@@ -73,7 +95,7 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
             {
                 // EDIT MODE: Populate the form with the existing expense data
                 Description = _editingExpense.Description ?? string.Empty;
-                Amount = _editingExpense.Amount;
+                AmountText = _editingExpense.Amount.ToString();
                 Category = _editingExpense.Category ?? string.Empty;
                 PaymentDate = _editingExpense.PaymentDate;
             }
@@ -81,10 +103,15 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
             {
                 // ADD MODE
                 Description = string.Empty;
-                Amount = 0;
+                AmountText = "0";
                 Category = "Photography";
                 PaymentDate = DateTime.Now;
             }
+            ErrorsChanged += (sender, args) =>
+            {
+                OnPropertyChanged(nameof(CanSave));
+                OnPropertyChanged(nameof(ShowValidationSummary));
+            };
         }
 
         public void GoBack()
@@ -94,10 +121,23 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
 
         public async Task SaveAsync()
         {
+            _formSubmitAttempted = true;
+            ValidateDescription();
+            ValidateAmount();
+            ValidateDate();
+
+            OnPropertyChanged(nameof(CanSave));
+            OnPropertyChanged(nameof(ShowValidationSummary));
+
+            if (HasErrors)
+            {
+                return;
+            }
+
             var dto = new CreateExpenseDto
             {
                 Description = Description,
-                Amount = Amount.HasValue ? Amount.Value : 0,
+                Amount = _amount.HasValue ? _amount.Value : 0,
                 Category = Category,
                 PaymentDate = PaymentDate ?? DateTime.Now,
                 WeddingID = _weddingId
@@ -123,6 +163,47 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
             else
             {
                 await Task.CompletedTask;
+            }
+        }
+
+        private void ValidateDescription()
+        {
+            ClearErrors(nameof(Description));
+            if (string.IsNullOrWhiteSpace(Description))
+            {
+                AddError(nameof(Description), "Description is required.");
+            }
+            else if (Description.Length > 200)
+            {
+                AddError(nameof(Description), "Description cannot exceed 200 characters.");
+            }
+        }
+
+        private void ValidateAmount()
+        {
+            ClearErrors(nameof(AmountText)); // Validate the string property
+
+            // Use the private decimal field for validation
+            if (!_amount.HasValue)
+            {
+                AddError(nameof(AmountText), "Amount is required and must be a valid number.");
+            }
+            else if (_amount < 0)
+            {
+                AddError(nameof(AmountText), "Amount cannot be negative.");
+            }
+        }
+
+        private void ValidateDate()
+        {
+            ClearErrors(nameof(PaymentDate));
+            if (!PaymentDate.HasValue)
+            {
+                AddError(nameof(PaymentDate), "Payment Date is required.");
+            }
+            else if (PaymentDate > DateTime.Now)
+            {
+                AddError(nameof(PaymentDate), "Payment Date cannot be in the future.");
             }
         }
     }

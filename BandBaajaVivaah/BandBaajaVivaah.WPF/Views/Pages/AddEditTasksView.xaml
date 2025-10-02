@@ -14,12 +14,14 @@
 
     <Page.Resources>
         <converters:RadioButtonToStringConverter x:Key="RadioButtonToStringConverter"/>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     </Page.Resources>
 
     <DockPanel Margin="10">
         <views:AddEditToolBar DockPanel.Dock="Top"
                            BackButtonClicked="Toolbar_BackButtonClicked"
-                           SaveButtonClicked="Toolbar_SaveButtonClicked"/>
+                           SaveButtonClicked="Toolbar_SaveButtonClicked"
+                           IsSaveEnabled="{Binding CanSave}"/>
 
         <Grid Margin="20">
             <Grid.ColumnDefinitions>
@@ -34,37 +36,38 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <!-- Title -->
             <Label Content="Title"
                Style="{StaticResource Styles.Label}"
                Grid.Row="0" Grid.Column="0" VerticalAlignment="Center"/>
-            <TextBox Text="{Binding TitleText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                 Style="{StaticResource Styles.DataEntryTextBox}"
-                 Grid.Row="0" Grid.ColumnSpan="2" HorizontalAlignment="Left"
-                 Margin="125,5"/>
+            <TextBox Text="{Binding TitleText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}"
+                 Style="{StaticResource Styles.ValidatedTextBoxStyle}"
+                 Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left"
+                 Width="300" Margin="45,5,0,5"/>
 
             <!-- Description -->
             <Label Content="Description"
                Style="{StaticResource Styles.Label}"
                Grid.Row="1" Grid.Column="0" VerticalAlignment="Center"/>
-            <TextBox Text="{Binding Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                 Style="{StaticResource Styles.DataEntryTextBox}"
-                 Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Left"
-                 Margin="125,5"
+            <TextBox Text="{Binding Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}"
+                 Style="{StaticResource Styles.ValidatedTextBoxStyle}"
+                 Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left"
+                 Width="300" Margin="45,5,0,5"
                  Height="80" TextWrapping="Wrap" AcceptsReturn="True"/>
 
             <!-- Due Date -->
             <Label Content="Due Date"
                Style="{StaticResource Styles.Label}"
                Grid.Row="2" Grid.Column="0" VerticalAlignment="Center"/>
-            <DatePicker SelectedDate="{Binding DueDate, Mode=TwoWay}"
+            <DatePicker SelectedDate="{Binding DueDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}"
                       Grid.Row="2" Grid.Column="1"
                       HorizontalAlignment="Left"
                       Width="200"
                       Margin="45,4,0,4"
-                      Style="{StaticResource Styles.DatePicker}"/>
+                      Style="{StaticResource Styles.ValidatedDatePickerStyle}"/>
 
             <!-- Status Radio Buttons -->
             <Label Content="Status" 
@@ -72,8 +75,8 @@
                    VerticalAlignment="Center" 
                    Margin="0,0,10,0" 
                    Style="{StaticResource Styles.Label}"/>
-            <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                <RadioButton Content="Not Started" GroupName="StatusGroup" Margin="40,0,15,0" Style="{x:Null}"
+            <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="45,5,0,5">
+                <RadioButton Content="Not Started" GroupName="StatusGroup" Margin="0,0,15,0" Style="{x:Null}"
                             IsChecked="{Binding Status, Converter={StaticResource RadioButtonToStringConverter}, ConverterParameter='Not Started'}"/>
                 <RadioButton Content="In Progress" GroupName="StatusGroup" Margin="0,0,15,0" Style="{x:Null}"
                             IsChecked="{Binding Status, Converter={StaticResource RadioButtonToStringConverter}, ConverterParameter='In Progress'}"/>
@@ -82,6 +85,19 @@
                 <RadioButton Content="Delayed" GroupName="StatusGroup" Style="{x:Null}"
                             IsChecked="{Binding Status, Converter={StaticResource RadioButtonToStringConverter}, ConverterParameter='Delayed'}"/>
             </StackPanel>
+
+            <!-- Error message indicator - only shown when form submit attempted and has errors -->
+            <Border Grid.Row="4" Grid.ColumnSpan="2" 
+                    BorderThickness="1" BorderBrush="#FFDC000C" 
+                    Background="#15FF0000" CornerRadius="3" 
+                    Margin="0,15,0,0" Padding="10"
+                    Visibility="{Binding ShowValidationSummary, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="⚠️" FontSize="14" Margin="0,0,8,0"/>
+                    <TextBlock Text="Please correct all errors before saving." 
+                   FontWeight="Medium" Foreground="DarkRed"/>
+                </StackPanel>
+            </Border>
         </Grid>
     </DockPanel>
 </Page>

@@ -2,6 +2,7 @@
 using BandBaajaVivaah.WPF.Services;
 using BandBaajaVivaah.WPF.ViewModel;
 using BandBaajaVivaah.WPF.ViewModel.AddEditViewModel;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace BandBaajaVivaah.WPF.Views.Pages
@@ -42,7 +43,22 @@ namespace BandBaajaVivaah.WPF.Views.Pages
 
         private void Toolbar_BackButtonClicked(object sender, EventArgs e)
         {
-            ViewModel?.GoBack();
+            if (ViewModel != null && ViewModel.HasErrors)
+            {
+                var result = MessageBox.Show("There are validation errors. Are you sure you want to discard your changes?",
+                                             "Confirm Navigation",
+                                             MessageBoxButton.YesNo,
+                                             MessageBoxImage.Warning);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    ViewModel.GoBack();
+                }
+            }
+            else
+            {
+                ViewModel?.GoBack();
+            }
         }
 
         private async void Toolbar_SaveButtonClicked(object sender, EventArgs e)
