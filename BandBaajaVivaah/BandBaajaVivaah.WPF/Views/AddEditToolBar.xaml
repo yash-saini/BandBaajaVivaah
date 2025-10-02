@@ -13,6 +13,7 @@
             <Button x:Name="BackButton" Click="BackButton_Click"
                 Style="{StaticResource Styles.ButtonOnPageToolBar}" 
                 Margin="5,0,20,0"
+                IsEnabled="{Binding IsBackEnabled, RelativeSource={RelativeSource AncestorType={x:Type local:AddEditToolBar}}}"
                 ToolTip="Back to Weddings Page">
                 <iconPacks:PackIconMaterial Kind="ArrowLeft" Width="24" Height="10"/>
             </Button>
@@ -20,6 +21,7 @@
             <Button x:Name="SaveButton" Click="SaveButton_Click"
                     Style="{StaticResource Styles.ButtonOnPageToolBar}" 
                     Margin="5,0,20,0"
+                    IsEnabled="{Binding IsSaveEnabled, RelativeSource={RelativeSource AncestorType={x:Type local:AddEditToolBar}}}"
                     ToolTip="Save">
                 <iconPacks:PackIconMaterial Kind="Floppy" Width="24" Height="15"/>
             </Button>

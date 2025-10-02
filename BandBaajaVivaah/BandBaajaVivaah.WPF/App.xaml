@@ -16,6 +16,7 @@
                 <ResourceDictionary Source="/Resources/Styles/Common/Controls.Menu.xaml"/>
                 <ResourceDictionary Source="Resources/Styles/Common/Controls.DatePicker.xaml"/>
                 <ResourceDictionary Source="Resources/Styles/Common/Controls.DataGrid.xaml"/>
+                <ResourceDictionary Source="Resources/Styles/Common/Controls.ValidationStyle.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

@@ -10,6 +10,26 @@ namespace BandBaajaVivaah.WPF.Views
     {
         public event EventHandler BackButtonClicked;
         public event EventHandler SaveButtonClicked;
+
+        public static readonly DependencyProperty IsSaveEnabledProperty =
+            DependencyProperty.Register(nameof(IsSaveEnabled), typeof(bool), typeof(AddEditToolBar),
+                new PropertyMetadata(true));
+
+        public static readonly DependencyProperty IsBackEnabledProperty =
+            DependencyProperty.Register(nameof(IsBackEnabled), typeof(bool), typeof(AddEditToolBar),
+                new PropertyMetadata(true));
+
+        public bool IsSaveEnabled
+        {
+            get { return (bool)GetValue(IsSaveEnabledProperty); }
+            set { SetValue(IsSaveEnabledProperty, value); }
+        }
+
+        public bool IsBackEnabled
+        {
+            get { return (bool)GetValue(IsBackEnabledProperty); }
+            set { SetValue(IsBackEnabledProperty, value); }
+        }
         public AddEditToolBar()
         {
             InitializeComponent();

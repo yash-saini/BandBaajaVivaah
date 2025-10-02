@@ -1,16 +1,19 @@
 ﻿using BandBaajaVivaah.Contracts.DTOs;
 using BandBaajaVivaah.WPF.Services;
 using BandBaajaVivaah.WPF.ViewModel.Base;
-using System.Windows;
 
 namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
 {
-    public class AddEditTasksViewModel : ViewModelBase
+    public class AddEditTasksViewModel : ValidatableViewModelBase
     {
         private readonly ApiClientService _apiClient;
         private readonly NavigationService _navigationService;
         private readonly TaskDto? _editingTask;
         private readonly int _weddingId;
+
+        private bool _formSubmitAttempted = false;
+
+        public bool ShowValidationSummary => _formSubmitAttempted && HasErrors;
 
         public string Title => _editingTask == null ? "Add New Task" : "Edit Task";
 
@@ -22,6 +25,8 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
             {
                 _title = value;
                 OnPropertyChanged(nameof(TitleText));
+                if (_formSubmitAttempted)
+                    ValidateTitle();
             }
         }
 
@@ -33,6 +38,8 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
             {
                 _description = value;
                 OnPropertyChanged(nameof(Description));
+                if (_formSubmitAttempted)
+                    ValidateDescription();
             }
         }
 
@@ -44,6 +51,8 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
             {
                 _dueDate = value;
                 OnPropertyChanged(nameof(DueDate));
+                if (_formSubmitAttempted)
+                    ValidateDate();
             }
         }
         private string _status = string.Empty;
@@ -56,6 +65,8 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
                 OnPropertyChanged(nameof(Status));
             }
         }
+
+        public bool CanSave => !HasErrors;
 
         public bool WasSuccess { get; private set; } = false;
 
@@ -84,6 +95,11 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
                 DueDate = DateTime.Now.AddDays(30);
                 Status = "Not Started";
             }
+            ErrorsChanged += (sender, args) =>
+            {
+                OnPropertyChanged(nameof(CanSave));
+                OnPropertyChanged(nameof(ShowValidationSummary));
+            };
         }
 
         public void GoBack()
@@ -93,6 +109,19 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
 
         public async Task SaveAsync()
         {
+            _formSubmitAttempted = true;
+            ValidateTitle();
+            ValidateDescription();
+            ValidateDate();
+
+            OnPropertyChanged(nameof(CanSave));
+            OnPropertyChanged(nameof(ShowValidationSummary));
+
+            if (HasErrors)
+            {
+                return;
+            }
+
             var dto = new CreateTaskDto
             {
                 Title = TitleText,
@@ -122,6 +151,45 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
             else
             {
                 await Task.CompletedTask;
+            }
+        }
+
+        private void ValidateTitle()
+        {
+            ClearErrors(nameof(TitleText));
+            if (string.IsNullOrWhiteSpace(TitleText))
+            {
+                AddError(nameof(TitleText), "Title cannot be empty.");
+            }
+            else if (TitleText.Length > 50)
+            {
+                AddError(nameof(TitleText), "Title cannot be longer than 50 characters.");
+            }
+        }
+
+        private void ValidateDescription()
+        {
+            ClearErrors(nameof(Description));
+            if (string.IsNullOrWhiteSpace(Description))
+            {
+                AddError(nameof(Description), "Description cannot be empty.");
+            }
+            else if (Description.Length > 200)
+            {
+                AddError(nameof(Description), "Description cannot be longer than 200 characters.");
+            }
+        }
+
+        private void ValidateDate()
+        {
+            ClearErrors(nameof(DueDate));
+            if (DueDate == null)
+            {
+                AddError(nameof(DueDate), "Due Date is required.");
+            }
+            else if (DueDate < DateTime.Today)
+            {
+                AddError(nameof(DueDate), "Due Date cannot be in the past.");
             }
         }
     }

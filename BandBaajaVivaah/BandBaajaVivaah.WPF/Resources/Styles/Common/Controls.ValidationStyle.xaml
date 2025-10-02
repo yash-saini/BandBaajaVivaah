@@ -1,0 +1,61 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Simplified error template that doesn't block mouse input -->
+    <ControlTemplate x:Key="ValidationErrorTemplate">
+        <Grid>
+            <AdornedElementPlaceholder x:Name="adornedElement" />
+
+            <Grid HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,5,0"
+              IsHitTestVisible="False">
+                <Ellipse Width="16" Height="16" Fill="#FFDC000C"/>
+                <TextBlock Text="!" Foreground="White" FontSize="12" FontWeight="Bold" 
+                       VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            </Grid>
+        </Grid>
+    </ControlTemplate>
+
+    <!-- Enhanced tooltip style -->
+    <Style x:Key="ValidationToolTipStyle" TargetType="ToolTip">
+        <Setter Property="Background" Value="#FFDC000C"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="FontWeight" Value="Medium"/>
+        <Setter Property="Padding" Value="8,6"/>
+        <Setter Property="HasDropShadow" Value="True"/>
+    </Style>
+
+    <Style x:Key="Styles.ValidatedTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource Styles.DataEntryTextBox}">
+        <Setter Property="Validation.ErrorTemplate" Value="{StaticResource ValidationErrorTemplate}"/>
+        <Style.Triggers>
+            <Trigger Property="Validation.HasError" Value="True">
+                <Setter Property="ToolTip">
+                    <Setter.Value>
+                        <ToolTip Style="{StaticResource ValidationToolTipStyle}"
+                                 Content="{Binding RelativeSource={RelativeSource Self}, 
+                                 Path=PlacementTarget.(Validation.Errors)[0].ErrorContent}"/>
+                    </Setter.Value>
+                </Setter>
+                <!-- Keep the original BorderBrush to make it more obvious -->
+                <Setter Property="BorderBrush" Value="#FFDC000C"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="Styles.ValidatedDatePickerStyle" TargetType="DatePicker" BasedOn="{StaticResource Styles.DatePicker}">
+        <Setter Property="Validation.ErrorTemplate" Value="{StaticResource ValidationErrorTemplate}"/>
+        <Style.Triggers>
+            <Trigger Property="Validation.HasError" Value="True">
+                <Setter Property="ToolTip">
+                    <Setter.Value>
+                        <ToolTip Style="{StaticResource ValidationToolTipStyle}"
+                                 Content="{Binding RelativeSource={RelativeSource Self}, 
+                                 Path=PlacementTarget.(Validation.Errors)[0].ErrorContent}"/>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="BorderBrush" Value="#FFDC000C"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+</ResourceDictionary>
