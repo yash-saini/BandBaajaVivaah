@@ -1,15 +1,18 @@
 ﻿using BandBaajaVivaah.Contracts.DTOs;
 using BandBaajaVivaah.WPF.Services;
 using BandBaajaVivaah.WPF.ViewModel.Base;
-using System.Windows;
 
 namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
 {
-    public class AddEditWeddingViewModel : ViewModelBase
+    public class AddEditWeddingViewModel : ValidatableViewModelBase
     {
         private readonly ApiClientService _apiClient;
         private readonly NavigationService _navigationService;
         private readonly WeddingDto? _editingWedding;
+
+        private bool _formSubmitAttempted = false;
+
+        public bool ShowValidationSummary => _formSubmitAttempted && HasErrors;
 
         public string Title => _editingWedding == null ? "Add New Wedding" : "Edit Wedding";
 
@@ -21,6 +24,8 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
             {
                 _weddingName = value;
                 OnPropertyChanged(nameof(WeddingName));
+                if (_formSubmitAttempted)
+                    ValidateWeddingName();
             }
         }
 
@@ -32,19 +37,36 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
             {
                 _weddingDate = value;
                 OnPropertyChanged(nameof(WeddingDate));
+                if (_formSubmitAttempted)
+                    ValidateDate();
             }
         }
 
         private decimal? _totalBudget = 0;
-        public decimal? TotalBudget
+        private string _budgetText = "0";
+        public string BudgetText
         {
-            get => _totalBudget;
+            get => _budgetText;
             set
             {
-                _totalBudget = value;
-                OnPropertyChanged(nameof(TotalBudget));
+                _budgetText = value;
+                OnPropertyChanged(nameof(BudgetText));
+
+                // Try to parse the string. If it fails, the value is invalid (null).
+                if (decimal.TryParse(value, out decimal parsedAmount))
+                {
+                    _totalBudget = parsedAmount;
+                }
+                else
+                {
+                    _totalBudget = null; // Invalid input like "abc" or empty string
+                }
+
+                if (_formSubmitAttempted) ValidateBudget();
             }
         }
+
+        public bool CanSave => !HasErrors;
 
         public bool WasSuccess { get; private set; } = false;
 
@@ -61,24 +83,41 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
                 // EDIT MODE: Populate the form with the existing wedding's data
                 WeddingName = _editingWedding.WeddingName;
                 WeddingDate = _editingWedding.WeddingDate;
-                TotalBudget = _editingWedding.TotalBudget;
+                BudgetText = _editingWedding.TotalBudget.ToString();
             }
             else
             {
                 // ADD MODE
                 WeddingDate = DateTime.Now;
-                TotalBudget = 0;
+                BudgetText = "0";
                 WeddingName = string.Empty;
             }
+            ErrorsChanged += (sender, args) =>
+            {
+                OnPropertyChanged(nameof(CanSave));
+                OnPropertyChanged(nameof(ShowValidationSummary));
+            };
         }
 
         public async Task SaveAsync()
         {
+            _formSubmitAttempted = true;
+            ValidateWeddingName();
+            ValidateDate();
+            ValidateBudget();
+
+            OnPropertyChanged(nameof(CanSave));
+            OnPropertyChanged(nameof(ShowValidationSummary));
+
+            if (HasErrors)
+            {
+                return;
+            }
             var dto = new CreateWeddingDto
             {
                 WeddingName = this.WeddingName,
                 WeddingDate = this.WeddingDate.HasValue ? this.WeddingDate.Value : DateTime.Today,
-                TotalBudget = this.TotalBudget.HasValue ? this.TotalBudget.Value : 0
+                TotalBudget = this._totalBudget.HasValue ? this._totalBudget.Value : 0
             };
 
             bool success;
@@ -107,6 +146,45 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
         public void GoBack()
         {
             _navigationService.GoBack();
+        }
+
+        private void ValidateWeddingName()
+        {
+            ClearErrors(nameof(WeddingName));
+            if (string.IsNullOrWhiteSpace(WeddingName))
+            {
+                AddError(nameof(WeddingName), "Wedding Name is required.");
+            }
+            else if (WeddingName.Length > 100)
+            {
+                AddError(nameof(WeddingName), "Wedding Name cannot exceed 100 characters.");
+            }
+        }
+
+        private void ValidateDate()
+        {
+            ClearErrors(nameof(WeddingDate));
+            if (!WeddingDate.HasValue)
+            {
+                AddError(nameof(WeddingDate), "Wedding Date is required.");
+            }
+            else if (WeddingDate.Value.Date < DateTime.Now.Date)
+            {
+                AddError(nameof(WeddingDate), "Wedding Date cannot be in the past.");
+            }
+        }
+
+        private void ValidateBudget()
+        {
+            ClearErrors(nameof(BudgetText));
+            if (!_totalBudget.HasValue)
+            {
+                AddError(nameof(BudgetText), "Total Budget is required.");
+            }
+            else if (_totalBudget < 0)
+            {
+                AddError(nameof(BudgetText), "Total Budget cannot be negative.");
+            }
         }
     }
 }
