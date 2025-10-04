@@ -5,13 +5,16 @@ using System.Windows;
 
 namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
 {
-    public class AddEditGuestsViewModel : ViewModelBase
+    public class AddEditGuestsViewModel : ValidatableViewModelBase
     {
         private readonly ApiClientService _apiClient;
         private readonly NavigationService _navigationService;
         private readonly GuestDto? _editingGuests;
         private readonly int _weddingId;
 
+        private bool _formSubmitAttempted = false;
+
+        public bool ShowValidationSummary => _formSubmitAttempted && HasErrors;
         public string Title => _editingGuests == null ? "Add New Guest" : "Edit Guest";
 
         private string _firstName = string.Empty;
@@ -22,6 +25,8 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
             {
                 _firstName = value;
                 OnPropertyChanged(nameof(FirstName));
+                if (_formSubmitAttempted)
+                    ValidateFirstName();
             }
         }
 
@@ -33,6 +38,8 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
             {
                 _lastName = value;
                 OnPropertyChanged(nameof(LastName));
+                if (_formSubmitAttempted)
+                    ValidateLastName();
             }
         }
 
@@ -57,6 +64,8 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
                 OnPropertyChanged(nameof(RSVPStatus));
             }
         }
+
+        public bool CanSave => !HasErrors;
 
         public bool WasSuccess { get; private set; } = false;
 
@@ -85,6 +94,11 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
                 Side = "Bride";
                 RSVPStatus = "No Response";
             }
+            ErrorsChanged += (sender, args) =>
+            {
+                OnPropertyChanged(nameof(CanSave));
+                OnPropertyChanged(nameof(ShowValidationSummary));
+            };
         }
 
         public void GoBack()
@@ -94,6 +108,17 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
 
         public async Task SaveAsync()
         {
+            _formSubmitAttempted = true;
+            ValidateFirstName();
+            ValidateLastName();
+            OnPropertyChanged(nameof(CanSave));
+            OnPropertyChanged(nameof(ShowValidationSummary));
+
+            if (HasErrors)
+            {
+                return;
+            }
+
             var dto = new CreateGuestDto
             {
                 FirstName = FirstName,
@@ -124,6 +149,32 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
             else
             {
                 await Task.CompletedTask;
+            }
+        }
+
+        private void ValidateFirstName()
+        {
+            ClearErrors(nameof(FirstName));
+            if (string.IsNullOrWhiteSpace(FirstName))
+            {
+                AddError(nameof(FirstName), "First Name is required.");
+            }
+            else if (FirstName.Length > 50)
+            {
+                AddError(nameof(FirstName), "First Name cannot exceed 50 characters.");
+            }
+        }
+
+        private void ValidateLastName()
+        {
+            ClearErrors(nameof(LastName));
+            if (string.IsNullOrWhiteSpace(LastName))
+            {
+                AddError(nameof(LastName), "Last Name is required.");
+            }
+            else if (LastName.Length > 50)
+            {
+                AddError(nameof(LastName), "Last Name cannot exceed 50 characters.");
             }
         }
     }

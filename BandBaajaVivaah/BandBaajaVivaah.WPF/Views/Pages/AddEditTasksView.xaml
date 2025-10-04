@@ -86,7 +86,7 @@
                             IsChecked="{Binding Status, Converter={StaticResource RadioButtonToStringConverter}, ConverterParameter='Delayed'}"/>
             </StackPanel>
 
-            <!-- Error message indicator - only shown when form submit attempted and has errors -->
+            <!-- Error message indicator -->
             <Border Grid.Row="4" Grid.ColumnSpan="2" 
                     BorderThickness="1" BorderBrush="#FFDC000C" 
                     Background="#15FF0000" CornerRadius="3" 

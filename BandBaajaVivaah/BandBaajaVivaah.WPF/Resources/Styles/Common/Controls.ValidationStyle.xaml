@@ -1,13 +1,15 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:BandBaajaVivaah.WPF.Converters">
+
+    <local:ValidationErrorConverter x:Key="ValidationErrorConverter"/>
 
     <!-- Simplified error template that doesn't block mouse input -->
     <ControlTemplate x:Key="ValidationErrorTemplate">
         <Grid>
             <AdornedElementPlaceholder x:Name="adornedElement" />
 
-            <Grid HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,5,0"
-              IsHitTestVisible="False">
+            <Grid HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,5,0">
                 <Ellipse Width="16" Height="16" Fill="#FFDC000C"/>
                 <TextBlock Text="!" Foreground="White" FontSize="12" FontWeight="Bold" 
                        VerticalAlignment="Center" HorizontalAlignment="Center"/>
@@ -31,12 +33,16 @@
             <Trigger Property="Validation.HasError" Value="True">
                 <Setter Property="ToolTip">
                     <Setter.Value>
-                        <ToolTip Style="{StaticResource ValidationToolTipStyle}"
-                                 Content="{Binding RelativeSource={RelativeSource Self}, 
-                                 Path=PlacementTarget.(Validation.Errors)[0].ErrorContent}"/>
+                        <ToolTip Style="{DynamicResource ValidationToolTipStyle}">
+                            <ToolTip.Content>
+                                <Binding Path="PlacementTarget.(Validation.Errors)" 
+                                     RelativeSource="{RelativeSource Self}" 
+                                     Converter="{StaticResource ValidationErrorConverter}"/>
+                            </ToolTip.Content>
+                        </ToolTip>
                     </Setter.Value>
                 </Setter>
-                <!-- Keep the original BorderBrush to make it more obvious -->
+                 <!--Keep the original BorderBrush to make it more obvious--> 
                 <Setter Property="BorderBrush" Value="#FFDC000C"/>
             </Trigger>
         </Style.Triggers>
@@ -48,9 +54,13 @@
             <Trigger Property="Validation.HasError" Value="True">
                 <Setter Property="ToolTip">
                     <Setter.Value>
-                        <ToolTip Style="{StaticResource ValidationToolTipStyle}"
-                                 Content="{Binding RelativeSource={RelativeSource Self}, 
-                                 Path=PlacementTarget.(Validation.Errors)[0].ErrorContent}"/>
+                        <ToolTip Style="{DynamicResource ValidationToolTipStyle}">
+                            <ToolTip.Content>
+                                <Binding Path="PlacementTarget.(Validation.Errors)" 
+                                     RelativeSource="{RelativeSource Self}" 
+                                     Converter="{StaticResource ValidationErrorConverter}"/>
+                            </ToolTip.Content>
+                        </ToolTip>
                     </Setter.Value>
                 </Setter>
                 <Setter Property="BorderBrush" Value="#FFDC000C"/>

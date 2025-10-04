@@ -11,15 +11,17 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Background="White"
       Title="AddEditGuestsView">
-    
+
     <Page.Resources>
         <converters:RadioButtonToStringConverter x:Key="RadioButtonToStringConverter"/>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     </Page.Resources>
 
-        <DockPanel Margin="10">
+    <DockPanel Margin="10">
         <views:AddEditToolBar DockPanel.Dock="Top"
                           BackButtonClicked="Toolbar_BackButtonClicked"
-                          SaveButtonClicked="Toolbar_SaveButtonClicked"/>
+                          SaveButtonClicked="Toolbar_SaveButtonClicked"
+                           IsSaveEnabled="{Binding CanSave}"/>
 
         <Grid Margin="20">
             <Grid.ColumnDefinitions>
@@ -34,14 +36,15 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <!-- First Name -->
             <Label Content="First Name"
                Style="{StaticResource Styles.Label}"
                Grid.Row="0" Grid.Column="0" VerticalAlignment="Center"/>
-            <TextBox Text="{Binding FirstName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                 Style="{StaticResource Styles.DataEntryTextBox}"
+            <TextBox Text="{Binding FirstName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}"
+                 Style="{StaticResource Styles.ValidatedTextBoxStyle}"
                  Grid.Row="0" Grid.ColumnSpan="2" HorizontalAlignment="Left"
                      Margin="125,5"/>
 
@@ -49,8 +52,8 @@
             <Label Content="Last Name"
                Style="{StaticResource Styles.Label}"
                Grid.Row="1" Grid.Column="0" VerticalAlignment="Center"/>
-            <TextBox Text="{Binding LastName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                 Style="{StaticResource Styles.DataEntryTextBox}"
+            <TextBox Text="{Binding LastName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}"
+                 Style="{StaticResource Styles.ValidatedTextBoxStyle}"
                      HorizontalAlignment="Left"
                      Margin="125,5"
                      Grid.Row="1" Grid.ColumnSpan="2" />
@@ -76,6 +79,19 @@
                 <RadioButton Content="No Response" GroupName="RsvpGroup" Style="{x:Null}"
                                  IsChecked="{Binding RSVPStatus, Converter={StaticResource RadioButtonToStringConverter}, ConverterParameter='No Response'}"/>
             </StackPanel>
+
+            <!-- Error message indicator -->
+            <Border Grid.Row="4" Grid.ColumnSpan="2" 
+                    BorderThickness="1" BorderBrush="#FFDC000C" 
+                    Background="#15FF0000" CornerRadius="3" 
+                    Margin="0,15,0,0" Padding="10"
+                    Visibility="{Binding ShowValidationSummary, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="⚠️" FontSize="14" Margin="0,0,8,0"/>
+                    <TextBlock Text="Please correct all errors before saving." 
+                   FontWeight="Medium" Foreground="DarkRed"/>
+                </StackPanel>
+            </Border>
         </Grid>
     </DockPanel>
 </Page>
