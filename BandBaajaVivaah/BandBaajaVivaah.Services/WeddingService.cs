@@ -12,6 +12,8 @@ namespace BandBaajaVivaah.Services
 
         Task<bool> DeleteWeddingAsync(int weddingId, int ownerUserId);
         Task<bool> UpdateWeddingAsync(int weddingId, CreateWeddingDto weddingDto, int ownerUserId);
+
+        Task<IEnumerable<WeddingDto>> GetAllWeddingsAsync();
     }
 
     public class WeddingService : IWeddingService
@@ -102,6 +104,19 @@ namespace BandBaajaVivaah.Services
             wedding.TotalBudget = weddingDto.TotalBudget;
             await _unitOfWork.CompleteAsync();
             return true;
+        }
+
+        public async Task<IEnumerable<WeddingDto>> GetAllWeddingsAsync()
+        {
+            var weddings = await _unitOfWork.Weddings.GetAllAsync();
+            return weddings.Select(w => new WeddingDto
+            {
+                WeddingID = w.WeddingId,
+                WeddingName = w.WeddingName,
+                WeddingDate = w.WeddingDate,
+                TotalBudget = w.TotalBudget,
+                OwnerUserId = w.OwnerUserId
+            });
         }
     }
 }

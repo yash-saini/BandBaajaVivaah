@@ -360,6 +360,68 @@ namespace BandBaajaVivaah.WPF.Services
                 return false;
             }
         }
+
+        public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("api/admin/users");
+                if (response.IsSuccessStatusCode)
+                {
+                    var users = await response.Content.ReadFromJsonAsync<IEnumerable<UserDto>>();
+                    return users ?? new List<UserDto>();
+                }
+            }
+            catch (HttpRequestException)
+            {
+                return Enumerable.Empty<UserDto>();
+            }
+            return new List<UserDto>();
+        }
+
+        public async Task<bool> UpdateUserRoleAsync(int userId, string newRole)
+        {
+            try
+            {
+                var response = await _httpClient.PutAsJsonAsync($"api/admin/users/{userId}/role", new { role = newRole });
+                return response.IsSuccessStatusCode;
+            }
+            catch (HttpRequestException)
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> DeleteUserAsync(int userId)
+        {
+            try
+            {
+                var response = await _httpClient.DeleteAsync($"api/admin/users/{userId}");
+                return response.IsSuccessStatusCode;
+            }
+            catch (HttpRequestException)
+            {
+                return false;
+            }
+        }
+
+        public async Task<IEnumerable<WeddingDto>> GetAllWeddingsAsync()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("api/admin/weddings");
+                if (response.IsSuccessStatusCode)
+                {
+                    var weddings = await response.Content.ReadFromJsonAsync<IEnumerable<WeddingDto>>();
+                    return weddings ?? new List<WeddingDto>();
+                }
+            }
+            catch (HttpRequestException)
+            {
+                return Enumerable.Empty<WeddingDto>();
+            }
+            return new List<WeddingDto>();
+        }
     }
 
     /// <summary>
