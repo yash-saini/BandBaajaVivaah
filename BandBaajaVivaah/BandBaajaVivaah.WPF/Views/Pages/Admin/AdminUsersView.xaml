@@ -1,0 +1,61 @@
+﻿<Page x:Class="BandBaajaVivaah.WPF.Views.Pages.Admin.AdminUsersView"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:BandBaajaVivaah.WPF.Views.Pages.Admin"
+      xmlns:views="clr-namespace:BandBaajaVivaah.WPF.Views"
+      xmlns:sys="clr-namespace:System;assembly=mscorlib"
+      xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+      xmlns:converters="clr-namespace:BandBaajaVivaah.WPF.Converters"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="AdminUsersView" Background="White">
+    <Page.Resources>
+            <converters:RadioButtonToStringConverter x:Key="RadioButtonToStringConverter"/>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </Page.Resources>
+
+        <DockPanel Margin="10">
+        <views:AdminToolBarView DockPanel.Dock="Top"
+                                BackButtonClicked="Toolbar_BackButtonClicked"
+                                DeleteButtonClicked="Toolbar_DeleteButtonClicked"
+                                RefreshButtonClicked="Toolbar_RefreshButtonClicked"
+                                FirstPageClicked="Toolbar_FirstPageClicked"
+                                PreviousPageClicked="Toolbar_PreviousPageClicked"
+                                NextPageClicked="Toolbar_NextPageClicked"
+                                LastPageClicked="Toolbar_LastPageClicked"
+                                CurrentPage="{Binding CurrentPage, Mode=OneWay}"
+                                TotalPages="{Binding TotalPages, Mode=OneWay}"
+                                IsFirstPage="{Binding IsOnFirstPage, Mode=OneWay}"
+                                IsLastPage="{Binding IsOnLastPage, Mode=OneWay}"
+                                IsDeleteEnabled="{Binding IsItemSelected, Mode=OneWay}"/>
+        <TextBlock Text="User Management" FontSize="24" FontWeight="Bold" Margin="0,10,0,10" DockPanel.Dock="Top"/>
+            
+        <DataGrid ItemsSource="{Binding DisplayedItems}" 
+                  SelectedItem="{Binding SelectedItem}" 
+                  IsReadOnly="True" 
+                  AutoGenerateColumns="False"
+                  MouseDoubleClick="DataGrid_MouseDoubleClick"
+                  Style="{StaticResource Styles.DataGrid}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Full Name" Binding="{Binding FullName}" IsReadOnly="True" Width="*"/>
+                <DataGridTextColumn Header="Email" Binding="{Binding Email}" IsReadOnly="True" Width="2*"/>
+                <DataGridTextColumn Header="Role" Binding="{Binding Role}" Width="*"/>
+
+                <DataGridTemplateColumn Header="Actions" Width="100">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button ToolTip="View user's data"
+                                    Style="{StaticResource Styles.Button}"
+                                    Command="{Binding DataContext.ViewUserWeddingsCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                    CommandParameter="{Binding}">
+                                <iconPacks:PackIconMaterial Kind="AccountEye" />
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
+</Page>

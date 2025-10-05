@@ -3,6 +3,8 @@ using BandBaajaVivaah.WPF.Commands;
 using BandBaajaVivaah.WPF.Services;
 using BandBaajaVivaah.WPF.ViewModel.Base;
 using BandBaajaVivaah.WPF.Views;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Windows;
 using System.Windows.Input;
 
@@ -61,6 +63,8 @@ namespace BandBaajaVivaah.WPF.ViewModel
 
         private readonly ApiClientService _apiClient;
 
+        public string Role { get; private set; }
+
         public LoginViewModel(ApiClientService apiClient)
         {
             _apiClient = apiClient ?? throw new ArgumentNullException(nameof(apiClient));
@@ -106,6 +110,10 @@ namespace BandBaajaVivaah.WPF.ViewModel
 
                 if (token != null)
                 {
+                    var handler = new JwtSecurityTokenHandler();
+                    var jwtToken = handler.ReadJwtToken(token);
+                    Role = jwtToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Role)?.Value;
+
                     IsLoginSuccessful = true;
                 }
                 else

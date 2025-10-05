@@ -41,7 +41,7 @@ namespace BandBaajaVivaah.WPF
                 // If the login was successful...
                 if (loginViewModel.IsLoginSuccessful)
                 {
-                    var mainViewModel = new MainViewModel(apiClient, navigationService, loginViewModel.Email);
+                    var mainViewModel = new MainViewModel(apiClient, navigationService, loginViewModel.Email, loginViewModel.Role);
                     var mainView = new MainWindow
                     {
                         DataContext = mainViewModel
