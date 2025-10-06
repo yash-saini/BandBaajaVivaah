@@ -28,7 +28,7 @@
                                 IsLastPage="{Binding IsOnLastPage, Mode=OneWay}"
                                 IsDeleteEnabled="{Binding IsItemSelected, Mode=OneWay}"/>
 
-        <TextBlock Text="My Weddings" FontSize="24" FontWeight="Bold" Margin="0,10,0,10" DockPanel.Dock="Top"/>
+        <TextBlock Text="Weddings" FontSize="24" FontWeight="Bold" Margin="0,10,0,10" DockPanel.Dock="Top"/>
 
         <DataGrid ItemsSource="{Binding DisplayedItems}" 
                   SelectedItem="{Binding SelectedItem}"

@@ -1,4 +1,5 @@
-﻿using BandBaajaVivaah.WPF.Services;
+﻿using BandBaajaVivaah.Contracts.DTO;
+using BandBaajaVivaah.WPF.Services;
 using BandBaajaVivaah.WPF.ViewModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -21,21 +22,32 @@ namespace BandBaajaVivaah.WPF.Views.Pages
             InitializeComponent();
             _apiClient = apiClient;
             _navigationService = navigationService;
-            var viewModel = new WeddingsViewModel(_apiClient, _navigationService);
-            viewModel.ShowMessageRequested += ViewModel_ShowMessageRequested;
-            viewModel.ShowConfirmationRequested += ViewModel_ShowConfirmationRequested;
+
+            var viewModel = new WeddingsViewModel(apiClient, navigationService);
+            SetupViewModelEvents(viewModel);
             DataContext = viewModel;
         }
 
-        private void ViewModel_ShowMessageRequested(object? sender, string message)
+        // Constructor for admin mode
+        public WeddingsView(ApiClientService apiClient, NavigationService navigationService, UserDto targetUser)
         {
-            MessageBox.Show(message);
+            InitializeComponent();
+            _apiClient = apiClient;
+            _navigationService = navigationService;
+
+            var viewModel = new WeddingsViewModel(apiClient, navigationService, targetUser);
+            SetupViewModelEvents(viewModel);
+            DataContext = viewModel;
         }
 
-        private void ViewModel_ShowConfirmationRequested(object? sender, (string Message, string Title, Action<bool> Callback) data)
+        private void SetupViewModelEvents(WeddingsViewModel viewModel)
         {
-            var result = MessageBox.Show(data.Message, data.Title, MessageBoxButton.YesNo);
-            data.Callback(result == MessageBoxResult.Yes);
+            viewModel.ShowMessageRequested += (s, msg) => MessageBox.Show(msg);
+            viewModel.ShowConfirmationRequested += (s, data) =>
+            {
+                var result = MessageBox.Show(data.Message, data.Title, MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                data.Callback(result == MessageBoxResult.Yes);
+            };
         }
 
         private void Toolbar_BackButtonClicked(object sender, EventArgs e)
@@ -45,8 +57,10 @@ namespace BandBaajaVivaah.WPF.Views.Pages
 
         private void Toolbar_AddButtonClicked(object sender, EventArgs e)
         {
-            var formPage = new AddEditWeddingsView(_apiClient, _navigationService);
-            _navigationService.NavigateTo(formPage);
+            if (ViewModel?.AddWeddingCommand != null)
+            {
+                ViewModel.AddWeddingCommand.Execute(null);
+            }
         }
 
         private async void Toolbar_DeleteButtonClicked(object sender, EventArgs e)
@@ -69,8 +83,21 @@ namespace BandBaajaVivaah.WPF.Views.Pages
         {
             if (ViewModel?.SelectedItem != null)
             {
-                var formPage = new AddEditWeddingsView(_apiClient, _navigationService, ViewModel.SelectedItem);
-                _navigationService.NavigateTo(formPage);
+                // Check if this is admin mode and pass targetUserId if it is
+                if (ViewModel.IsAdminMode && ViewModel.TargetUser != null)
+                {
+                    var formPage = new AddEditWeddingsView(
+                        _apiClient,
+                        _navigationService,
+                        ViewModel.SelectedItem,
+                        ViewModel.TargetUser.UserID); // Pass targetUserId for admin mode
+                    _navigationService.NavigateTo(formPage);
+                }
+                else
+                {
+                    var formPage = new AddEditWeddingsView(_apiClient, _navigationService, ViewModel.SelectedItem);
+                    _navigationService.NavigateTo(formPage);
+                }
             }
         }
 

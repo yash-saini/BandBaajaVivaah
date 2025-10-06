@@ -2,6 +2,7 @@
 using BandBaajaVivaah.WPF.Commands;
 using BandBaajaVivaah.WPF.Services;
 using BandBaajaVivaah.WPF.ViewModel.Base;
+using BandBaajaVivaah.WPF.Views.Pages;
 using System.Windows.Input;
 
 namespace BandBaajaVivaah.WPF.ViewModel.Admin
@@ -73,9 +74,8 @@ namespace BandBaajaVivaah.WPF.ViewModel.Admin
         {
             if (userObject is UserDto user)
             {
-                // We will create this view next
-                // _navigationService.NavigateTo(new AdminUserWeddingsView(_apiClient, _navigationService, user));
-                ShowMessageRequested?.Invoke(this, $"Navigating to weddings for {user.FullName}. (View not implemented yet)");
+                // Use the existing WeddingsView but in admin mode
+                _navigationService.NavigateTo(new WeddingsView(_apiClient, _navigationService, user));
             }
         }
 

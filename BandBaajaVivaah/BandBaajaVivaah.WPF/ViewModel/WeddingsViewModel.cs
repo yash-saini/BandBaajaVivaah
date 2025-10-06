@@ -1,10 +1,11 @@
-﻿using BandBaajaVivaah.Contracts.DTOs;
+﻿using BandBaajaVivaah.Contracts.DTO;
+using BandBaajaVivaah.Contracts.DTOs;
 using BandBaajaVivaah.WPF.Commands;
 using BandBaajaVivaah.WPF.Services;
 using BandBaajaVivaah.WPF.ViewModel.Base;
 using BandBaajaVivaah.WPF.Views.Pages;
+using BandBaajaVivaah.WPF.Views.Pages.Admin;
 using System.Collections.ObjectModel;
-using System.Windows;
 using System.Windows.Input;
 
 namespace BandBaajaVivaah.WPF.ViewModel
@@ -13,9 +14,15 @@ namespace BandBaajaVivaah.WPF.ViewModel
     {
         private readonly ApiClientService _apiClient;
         private readonly NavigationService _navigationService;
+        private readonly UserDto _targetUser;
+        private readonly bool _isAdminMode;
+        public bool IsAdminMode => _isAdminMode;
+        public UserDto? TargetUser => _isAdminMode ? _targetUser : null;
+
         public ICommand ManageGuestsCommand { get; }
         public ICommand ManageTasksCommand { get; }
         public ICommand ManageExpensesCommand { get; }
+        public ICommand AddWeddingCommand { get; }
 
         public event EventHandler<string> ShowMessageRequested;
         public event EventHandler<(string Message, string Title, Action<bool> Callback)> ShowConfirmationRequested;
@@ -64,18 +71,71 @@ namespace BandBaajaVivaah.WPF.ViewModel
             ManageGuestsCommand = new RelayCommand(NavigateToGuests);
             ManageTasksCommand = new RelayCommand(NavigateToTasks);
             ManageExpensesCommand = new RelayCommand(NavigateToExpenses);
+            AddWeddingCommand = new RelayCommand(_ => NavigateToAddWedding());
 
             LoadDataAsync();
         }
 
+        public WeddingsViewModel(ApiClientService apiClient, NavigationService navigationService, UserDto targetUser)
+        {
+            _apiClient = apiClient;
+            _navigationService = navigationService;
+            _targetUser = targetUser;
+            _isAdminMode = true;
+
+            ManageGuestsCommand = new RelayCommand(NavigateToGuests);
+            ManageTasksCommand = new RelayCommand(NavigateToTasks);
+            ManageExpensesCommand = new RelayCommand(NavigateToExpenses);
+            AddWeddingCommand = new RelayCommand(_ => NavigateToAddWedding());
+
+            LoadDataAsync();
+        }
+
+        private void NavigateToAddWedding()
+        {
+            if (_isAdminMode)
+            {
+                // Use existing AddEditWeddingsView but pass the target user ID
+                var addEditView = new AddEditWeddingsView(_apiClient, _navigationService, null, _targetUser.UserID);
+                _navigationService.NavigateTo(addEditView);
+            }
+            else
+            {
+                var addEditView = new AddEditWeddingsView(_apiClient, _navigationService);
+                _navigationService.NavigateTo(addEditView);
+            }
+        }
+
         public override async Task LoadDataAsync()
         {
-            var weddingsList = await _apiClient.GetWeddingsAsync();
-            if (weddingsList != null)
+            //var weddingsList = await _apiClient.GetWeddingsAsync();
+            //if (weddingsList != null)
+            //{
+            //    AllItems = weddingsList.ToList(); // Setting the base class's master list
+            //    CurrentPage = 1;
+            //    UpdateDisplayedItems(); // Refreshing the view
+            //}
+            IEnumerable<WeddingDto> weddings;
+
+            if (_isAdminMode)
             {
-                AllItems = weddingsList.ToList(); // Setting the base class's master list
-                CurrentPage = 1;
-                UpdateDisplayedItems(); // Refreshing the view
+                weddings = await _apiClient.GetWeddingsForUserAsync(_targetUser.UserID);
+            }
+            else
+            {
+                weddings = await _apiClient.GetWeddingsAsync();
+            }
+
+            if (weddings != null)
+            {
+                AllItems = weddings.ToList();
+                UpdateDisplayedItems();
+            }
+            else
+            {
+                ShowMessageRequested?.Invoke(this, "Failed to load weddings.");
+                AllItems = new List<WeddingDto>();
+                UpdateDisplayedItems();
             }
         }
 
@@ -139,22 +199,47 @@ namespace BandBaajaVivaah.WPF.ViewModel
                 return;
             }
 
+            var weddingToDelete = SelectedItem;
+
             ShowConfirmationRequested?.Invoke(this,
-                ($"Are you sure you want to delete the wedding - {SelectedItem.WeddingName}?",
+                ($"Are you sure you want to delete the wedding - {weddingToDelete.WeddingName}?",
                  "Confirm Delete",
-                 async (confirmed) =>
+                 // Use async void instead of async (which returns Task)
+                 async void (confirmed) =>
                  {
                      if (confirmed)
                      {
-                         var success = await _apiClient.DeleteWeddingAsync(SelectedItem.WeddingID);
-                         if (success)
+                         try
                          {
-                             await LoadDataAsync(); // Reload all data
-                             SelectedItem = null;
+                             bool success;
+
+                             // Use appropriate delete method based on mode
+                             if (_isAdminMode)
+                             {
+                                 success = await _apiClient.DeleteWeddingByAdminAsync(weddingToDelete.WeddingID);
+                             }
+                             else
+                             {
+                                 success = await _apiClient.DeleteWeddingAsync(weddingToDelete.WeddingID);
+                             }
+
+                             if (success)
+                             {
+                                 ShowMessageRequested?.Invoke(this, "Wedding deleted successfully.");
+                                 await LoadDataAsync(); // Reload all data
+                                 SelectedItem = null;
+                             }
+                             else
+                             {
+                                 ShowMessageRequested?.Invoke(this,
+                                     _isAdminMode
+                                         ? "Failed to delete the wedding. The server returned an error."
+                                         : "Failed to delete the wedding. You may not have permission.");
+                             }
                          }
-                         else
+                         catch (Exception ex)
                          {
-                             ShowMessageRequested?.Invoke(this, "Failed to delete the wedding. Please try again.");
+                             ShowMessageRequested?.Invoke(this, $"An error occurred: {ex.Message}");
                          }
                      }
                  }
