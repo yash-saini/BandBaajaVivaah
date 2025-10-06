@@ -1,4 +1,5 @@
-﻿using BandBaajaVivaah.Services;
+﻿using BandBaajaVivaah.Contracts.DTOs;
+using BandBaajaVivaah.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -75,6 +76,65 @@ namespace BandBaajaVivaah.WebAPI.Controllers
         {
             var weddings = await _weddingService.GetAllWeddingsAsync();
             return Ok(weddings);
+        }
+
+        [HttpGet("users/{userId}/weddings")]
+        public async Task<IActionResult> GetWeddingsForUser(int userId)
+        {
+            var weddings = await _weddingService.GetWeddingsForUserAsync(userId);
+            return Ok(weddings);
+        }
+
+        [HttpDelete("weddings/{weddingId}")]
+        public async Task<IActionResult> DeleteWedding(int weddingId)
+        {
+            // We can pass null for ownerUserId to bypass the ownership check for admin
+            var success = await _weddingService.DeleteWeddingAsync(weddingId, ownerUserId: null);
+            if (!success)
+            {
+                return NotFound();
+            }
+            return NoContent();
+        }
+
+        [HttpPost("users/{userId}/weddings")]
+        public async Task<IActionResult> AddWeddingForUser(int userId, [FromBody] CreateWeddingDto weddingDto)
+        {
+            // First check if the user exists
+            var user = await _userService.GetUserByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound(new { Message = "User not found" });
+            }
+
+            // Create the wedding for the specified user
+            var wedding = await _weddingService.CreateWeddingAsync(weddingDto, userId);
+
+            return CreatedAtAction(nameof(GetWeddingById), new { weddingId = wedding.WeddingID }, wedding);
+        }
+
+        [HttpGet("weddings/{weddingId}")]
+        public async Task<IActionResult> GetWeddingById(int weddingId)
+        {
+            // Admin can view any wedding regardless of ownership
+            var wedding = await _weddingService.GetWeddingByIdAsync(weddingId, null);
+            if (wedding == null)
+            {
+                return NotFound();
+            }
+            return Ok(wedding);
+        }
+
+        [HttpPut("weddings/{weddingId}")]
+        public async Task<IActionResult> UpdateWedding(int weddingId, [FromBody] CreateWeddingDto weddingDto)
+        {
+            // Admin can update any wedding
+            var success = await _weddingService.UpdateWeddingAsync(weddingId, weddingDto, null);
+            if (!success)
+            {
+                return NotFound();
+            }
+            return NoContent();
         }
     }
 

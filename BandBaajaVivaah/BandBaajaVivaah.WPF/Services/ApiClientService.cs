@@ -405,22 +405,64 @@ namespace BandBaajaVivaah.WPF.Services
             }
         }
 
-        public async Task<IEnumerable<WeddingDto>> GetAllWeddingsAsync()
+        public async Task<IEnumerable<WeddingDto>?> GetWeddingsForUserAsync(int userId)
         {
             try
             {
-                var response = await _httpClient.GetAsync("api/admin/weddings");
+                var response = await _httpClient.GetAsync($"api/Admin/users/{userId}/weddings");
                 if (response.IsSuccessStatusCode)
                 {
-                    var weddings = await response.Content.ReadFromJsonAsync<IEnumerable<WeddingDto>>();
-                    return weddings ?? new List<WeddingDto>();
+                    return await response.Content.ReadFromJsonAsync<IEnumerable<WeddingDto>>();
                 }
+                return null;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public async Task<WeddingDto?> AddWeddingForUserAsync(int userId, CreateWeddingDto weddingDto)
+        {
+            try
+            {
+                var response = await _httpClient.PostAsJsonAsync($"api/Admin/users/{userId}/weddings", weddingDto);
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadFromJsonAsync<WeddingDto>();
+                }
+                return null;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public async Task<bool> DeleteWeddingByAdminAsync(int weddingId)
+        {
+            try
+            {
+                var response = await _httpClient.DeleteAsync($"api/Admin/weddings/{weddingId}");
+                return response.IsSuccessStatusCode;
             }
             catch (HttpRequestException)
             {
-                return Enumerable.Empty<WeddingDto>();
+                return false;
             }
-            return new List<WeddingDto>();
+        }
+
+        public async Task<bool> UpdateWeddingByAdminAsync(int weddingId, CreateWeddingDto updateDto)
+        {
+            try
+            {
+                var response = await _httpClient.PutAsJsonAsync($"api/Admin/weddings/{weddingId}", updateDto);
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
     }
 

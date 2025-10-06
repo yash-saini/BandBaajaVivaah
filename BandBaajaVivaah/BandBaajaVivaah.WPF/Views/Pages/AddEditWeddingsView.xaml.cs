@@ -16,19 +16,22 @@ namespace BandBaajaVivaah.WPF.Views.Pages
         private readonly NavigationService _navigationService;
         private readonly ApiClientService _apiClient;
         private WeddingsViewModel? _parentViewModel;
+        private readonly int? _targetUserId;
 
-        public AddEditWeddingsView(ApiClientService apiClient, NavigationService navigationService, WeddingDto wedding = null)
+        public AddEditWeddingsView(ApiClientService apiClient, NavigationService navigationService, WeddingDto? wedding = null,
+            int? targetUserId = null)
         {
             InitializeComponent();
             _apiClient = apiClient;
             _navigationService = navigationService;
+            _targetUserId = targetUserId;
             if (navigationService.GetPreviousPage() is WeddingsView weddingsView &&
                  weddingsView.DataContext is WeddingsViewModel weddingsViewModel)
             {
                 _parentViewModel = weddingsViewModel;
             }
 
-            var viewModel = new AddEditWeddingViewModel(apiClient, navigationService, wedding);
+            var viewModel = new AddEditWeddingViewModel(apiClient, navigationService, wedding, targetUserId);
 
             // Hook up the refresh event
             viewModel.RefreshParentRequested += RefreshWeddingsData;

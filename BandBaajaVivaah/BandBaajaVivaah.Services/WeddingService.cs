@@ -6,12 +6,12 @@ namespace BandBaajaVivaah.Services
 {
     public interface IWeddingService
     {
-        Task<WeddingDto?> GetWeddingByIdAsync(int weddingId, int userId);
+        Task<WeddingDto?> GetWeddingByIdAsync(int weddingId, int? userId = null);
         Task<IEnumerable<WeddingDto>> GetWeddingsForUserAsync(int userId);
         Task<WeddingDto> CreateWeddingAsync(CreateWeddingDto weddingDto, int ownerUserId);
 
-        Task<bool> DeleteWeddingAsync(int weddingId, int ownerUserId);
-        Task<bool> UpdateWeddingAsync(int weddingId, CreateWeddingDto weddingDto, int ownerUserId);
+        Task<bool> DeleteWeddingAsync(int weddingId, int? ownerUserId);
+        Task<bool> UpdateWeddingAsync(int weddingId, CreateWeddingDto weddingDto, int? ownerUserId);
 
         Task<IEnumerable<WeddingDto>> GetAllWeddingsAsync();
     }
@@ -48,7 +48,7 @@ namespace BandBaajaVivaah.Services
             };
         }
 
-        public async Task<WeddingDto?> GetWeddingByIdAsync(int weddingId, int userId)
+        public async Task<WeddingDto?> GetWeddingByIdAsync(int weddingId, int? userId)
         {
             var wedding = await _unitOfWork.Weddings.GetByIdAsync(weddingId);
 
@@ -80,24 +80,32 @@ namespace BandBaajaVivaah.Services
             });
         }
 
-        public async Task<bool> DeleteWeddingAsync(int weddingId, int ownerUserId)
+        public async Task<bool> DeleteWeddingAsync(int weddingId, int? ownerUserId = null)
         {
             var wedding = await _unitOfWork.Weddings.GetByIdAsync(weddingId);
-            if (wedding == null || wedding.OwnerUserId != ownerUserId)
+
+            // If ownerUserId is null (admin request), skip owner check
+            if (wedding == null || (ownerUserId.HasValue && wedding.OwnerUserId != ownerUserId.Value))
             {
                 return false; // Not found or user does not have access
             }
+
             await _unitOfWork.Weddings.DeleteAsync(weddingId);
             await _unitOfWork.CompleteAsync();
             return true;
         }
 
-        public async Task<bool> UpdateWeddingAsync(int weddingId, CreateWeddingDto weddingDto, int ownerUserId)
+        public async Task<bool> UpdateWeddingAsync(int weddingId, CreateWeddingDto weddingDto, int? ownerUserId)
         {
             var wedding = await _unitOfWork.Weddings.GetByIdAsync(weddingId);
-            if (wedding == null || wedding.OwnerUserId != ownerUserId)
+            // If wedding doesn't exist, return false
+            if (wedding == null)
             {
-                return false; // Not found or user does not have access
+                return false;
+            }
+            if (ownerUserId.HasValue && wedding.OwnerUserId != ownerUserId.Value)
+            {
+                return false;
             }
             wedding.WeddingName = weddingDto.WeddingName;
             wedding.WeddingDate = weddingDto.WeddingDate;

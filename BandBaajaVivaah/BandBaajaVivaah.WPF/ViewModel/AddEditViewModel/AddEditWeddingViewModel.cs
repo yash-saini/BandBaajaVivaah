@@ -9,6 +9,8 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
         private readonly ApiClientService _apiClient;
         private readonly NavigationService _navigationService;
         private readonly WeddingDto? _editingWedding;
+        private readonly int? _targetUserId;
+        private bool _isAdminMode => _targetUserId.HasValue;
 
         private bool _formSubmitAttempted = false;
 
@@ -72,11 +74,12 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
 
         public event Func<Task> RefreshParentRequested;
 
-        public AddEditWeddingViewModel(ApiClientService apiClient, NavigationService navigationService, WeddingDto? wedding = null)
+        public AddEditWeddingViewModel(ApiClientService apiClient, NavigationService navigationService, WeddingDto? wedding = null, int? targetUserId = null)
         {
             _apiClient = apiClient;
             _navigationService = navigationService;
             _editingWedding = wedding;
+            _targetUserId = targetUserId;
 
             if (_editingWedding != null)
             {
@@ -123,12 +126,27 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
             bool success;
             if (_editingWedding == null) // Add Mode
             {
-                var newWedding = await _apiClient.CreateWeddingAsync(dto);
-                success = newWedding != null;
+                if (_isAdminMode)
+                {
+                    var newWedding = await _apiClient.AddWeddingForUserAsync(_targetUserId.Value, dto);
+                    success = newWedding != null;
+                }
+                else
+                {
+                    var newWedding = await _apiClient.CreateWeddingAsync(dto);
+                    success = newWedding != null;
+                }
             }
             else // Edit Mode
             {
-                success = await _apiClient.UpdateWeddingAsync(_editingWedding.WeddingID, dto);
+                if (_isAdminMode)
+                {
+                    success = await _apiClient.UpdateWeddingByAdminAsync(_editingWedding.WeddingID, dto);
+                }
+                else
+                {
+                    success = await _apiClient.UpdateWeddingAsync(_editingWedding.WeddingID, dto);
+                }
             }
 
             if (success)
