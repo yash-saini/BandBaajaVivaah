@@ -1,0 +1,81 @@
+﻿using BandBaajaVivaah.Contracts.DTOs;
+using BandBaajaVivaah.WPF.Services;
+using BandBaajaVivaah.WPF.ViewModel;
+using BandBaajaVivaah.WPF.ViewModel.AddEditViewModel;
+using System.Windows;
+using System.Windows.Controls;
+
+namespace BandBaajaVivaah.WPF.Views.Pages
+{
+    /// <summary>
+    /// Interaction logic for AddEditWeddingsView.xaml
+    /// </summary>
+    public partial class AddEditWeddingsView : Page
+    {
+        AddEditWeddingViewModel? ViewModel => DataContext as AddEditWeddingViewModel;
+        private readonly NavigationService _navigationService;
+        private readonly ApiClientService _apiClient;
+        private WeddingsViewModel? _parentViewModel;
+        private readonly int? _targetUserId;
+
+        public AddEditWeddingsView(ApiClientService apiClient, NavigationService navigationService, WeddingDto? wedding = null,
+            int? targetUserId = null)
+        {
+            InitializeComponent();
+            _apiClient = apiClient;
+            _navigationService = navigationService;
+            _targetUserId = targetUserId;
+            if (navigationService.GetPreviousPage() is WeddingsView weddingsView &&
+                 weddingsView.DataContext is WeddingsViewModel weddingsViewModel)
+            {
+                _parentViewModel = weddingsViewModel;
+            }
+
+            var viewModel = new AddEditWeddingViewModel(apiClient, navigationService, wedding, targetUserId);
+
+            // Hook up the refresh event
+            viewModel.RefreshParentRequested += RefreshWeddingsData;
+
+            this.DataContext = viewModel;
+        }
+
+        private void Toolbar_BackButtonClicked(object sender, EventArgs e)
+        {
+            if (ViewModel != null && ViewModel.HasErrors)
+            {
+                var result = MessageBox.Show("There are validation errors. Are you sure you want to discard your changes?",
+                                             "Confirm Navigation",
+                                             MessageBoxButton.YesNo,
+                                             MessageBoxImage.Warning);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    ViewModel.GoBack();
+                }
+            }
+            else
+            {
+                ViewModel?.GoBack();
+            }
+        }
+
+        private async void Toolbar_SaveButtonClicked(object sender, EventArgs e)
+        {
+            if (ViewModel != null)
+            {
+                await ViewModel.SaveAsync();
+            }
+        }
+
+        private async Task RefreshWeddingsData()
+        {
+            if (_parentViewModel != null)
+            {
+                await _parentViewModel.LoadDataAsync();
+                return;
+            }
+            var weddingsViewModel = new WeddingsViewModel(_apiClient, _navigationService);
+            await weddingsViewModel.LoadDataAsync();
+        }
+    }
+}

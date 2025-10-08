@@ -6,15 +6,50 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+	  <ApplicationIcon>Resources\Images\favicon.ico</ApplicationIcon>
+	  <ApplicationIcon>Resources\Images\trumpetFavicon.ico</ApplicationIcon>
+	  <ApplicationIcon>Resources\Images\ForgotPasswordFavicon.ico</ApplicationIcon>
+	  <ApplicationIcon>Resources\Images\RegisterFavicon.ico</ApplicationIcon>
+	  <ApplicationIcon>Resources\Images\ResetPasswordFavicon.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\Images\favicon.ico" />
+    <None Remove="Resources\Images\ForgotPasswordFavicon.ico" />
+    <None Remove="Resources\Images\RegisterFavicon.ico" />
+    <None Remove="Resources\Images\ResetPasswordFavicon.ico" />
+    <None Remove="Resources\Images\trumpetFavicon.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="MahApps.Metro" Version="2.4.10" />
     <PackageReference Include="MahApps.Metro.IconPacks" Version="6.1.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.1.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\BandBaajaVivaah.Contracts\BandBaajaVivaah.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\Images\BBVimage.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\favicon.ico">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\ForgotPasswordFavicon.ico">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\RegisterFavicon.ico">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\ResetPasswordFavicon.ico">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\trumpetFavicon.ico">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
 </Project>

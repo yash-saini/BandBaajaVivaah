@@ -13,6 +13,10 @@ namespace BandBaajaVivaah.Services
         Task<User?> GetUserByEmailAsync(string email);
         Task<bool> GeneratePasswordResetTokenAsync(string email);
         Task<bool> ResetPasswordAsync(string email, string token, string newPassword);
+
+        Task<IEnumerable<UserDto>> GetAllUsersAsync();
+        Task<bool> UpdateUserRoleAsync(int userId, string newRole);
+        Task<bool> DeleteUserAsync(int userId);
     }
 
     public class UserService : IUserService
@@ -104,6 +108,38 @@ namespace BandBaajaVivaah.Services
             user.PasswordResetToken = null;
             user.ResetTokenExpires = null;
 
+            await _unitOfWork.CompleteAsync();
+            return true;
+        }
+
+        public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
+        {
+            var users = await _unitOfWork.Users.GetAllAsync();
+            return users.Select(user => new UserDto
+            {
+                UserID = user.UserId,
+                FullName = user.FullName,
+                Email = user.Email,
+                Role = user.Role
+            });
+        }
+
+        public async Task<bool> UpdateUserRoleAsync(int userId, string newRole)
+        {
+            var user = await _unitOfWork.Users.GetByIdAsync(userId);
+            if (user == null) return false;
+
+            user.Role = newRole;
+            await _unitOfWork.CompleteAsync();
+            return true;
+        }
+
+        public async Task<bool> DeleteUserAsync(int userId)
+        {
+            var user = await _unitOfWork.Users.GetByIdAsync(userId);
+            if (user == null) return false;
+
+            await _unitOfWork.Users.DeleteAsync(userId);
             await _unitOfWork.CompleteAsync();
             return true;
         }

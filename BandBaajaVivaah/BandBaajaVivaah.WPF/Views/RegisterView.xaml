@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:BandBaajaVivaah.WPF.Views"
         mc:Ignorable="d"
         Title="Register" Height="450" Width="400"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        Icon="/Resources/Images/RegisterFavicon.ico">
     <Grid Margin="20">
         <StackPanel>
             <TextBlock HorizontalAlignment="Left" Margin="0,0,0,15">

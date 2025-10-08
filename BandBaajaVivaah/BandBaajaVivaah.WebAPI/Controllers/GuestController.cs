@@ -48,14 +48,56 @@ namespace BandBaajaVivaah.Api.Controllers
         {
             try
             {
-                var userId = GetCurrentUserId();
-                var createdGuest = await _guestService.CreateGuestAsync(guestDto, userId);
-                return Ok(createdGuest);
+                if (User.IsInRole("Admin"))
+                {
+                    var createdGuest = await _guestService.CreateGuestAsAdminAsync(guestDto);
+                    return Ok(createdGuest);
+                }
+                else
+                {
+                    var userId = GetCurrentUserId();
+                    var createdGuest = await _guestService.CreateGuestAsync(guestDto, userId);
+                    return Ok(createdGuest);
+                }
             }
             catch (UnauthorizedAccessException ex)
             {
                 return Forbid(ex.Message);
             }
+        }
+
+        [HttpPut("{guestId}")]
+        public async Task<IActionResult> UpdateGuest(int guestId, [FromBody] CreateGuestDto guestDto)
+        {
+            bool success;
+            if (User.IsInRole("Admin"))
+            {
+                success = await _guestService.UpdateGuestAsAdminAsync(guestId, guestDto);
+            }
+            else
+            {
+                var userId = GetCurrentUserId();
+                success = await _guestService.UpdateGuestAsync(guestId, guestDto, userId);
+            }
+
+            return success ? NoContent() : NotFound();
+        }
+
+        [HttpDelete("{guestId}")]
+        public async Task<IActionResult> DeleteGuest(int guestId)
+        {
+            bool success;
+            if (User.IsInRole("Admin"))
+            {
+                success = await _guestService.DeleteGuestAsAdminAsync(guestId);
+            }
+            else
+            {
+                var userId = GetCurrentUserId();
+                success = await _guestService.DeleteGuestAsync(guestId, userId);
+            }
+
+            return success ? NoContent() : NotFound();
         }
     }
 }
