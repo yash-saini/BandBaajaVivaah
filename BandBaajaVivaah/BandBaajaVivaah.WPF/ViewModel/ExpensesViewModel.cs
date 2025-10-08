@@ -82,8 +82,6 @@ namespace BandBaajaVivaah.WPF.ViewModel
             if (expensesList != null)
             {
                 AllItems = expensesList.ToList();
-                Expenses = new ObservableCollection<ExpenseDto>(AllItems);
-                CurrentPage = 1;
                 UpdateDisplayedItems();
             }
         }

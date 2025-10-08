@@ -49,9 +49,17 @@ namespace BandBaajaVivaah.Api.Controllers
         {
             try
             {
-                var userId = GetCurrentUserId();
-                var createdExpense = await _expenseService.CreateExpenseAsync(expenseDto, userId);
-                return Ok(createdExpense);
+                if (User.IsInRole("Admin"))
+                {
+                    var createdExpense = await _expenseService.CreateExpensesAsAdminAsync(expenseDto);
+                    return Ok(createdExpense);
+                }
+                else
+                {
+                    var userId = GetCurrentUserId();
+                    var createdExpense = await _expenseService.CreateExpenseAsync(expenseDto, userId);
+                    return Ok(createdExpense);
+                }
             }
             catch (UnauthorizedAccessException ex)
             {
@@ -62,26 +70,34 @@ namespace BandBaajaVivaah.Api.Controllers
         [HttpPut("{expenseId}")]
         public async Task<IActionResult> UpdateExpense(int expenseId, [FromBody] CreateExpenseDto expenseDto)
         {
-
-            var userId = GetCurrentUserId();
-            var updatedExpense = await _expenseService.UpdateExpenseAsync(expenseId, expenseDto, userId);
-            if (!updatedExpense)
+            bool success;
+            if (User.IsInRole("Admin"))
             {
-                return NotFound();
+                success = await _expenseService.UpdateExpensesAsAdminAsync(expenseId, expenseDto);
             }
-            return NoContent();
+            else
+            {
+
+               var userId = GetCurrentUserId();
+               success = await _expenseService.UpdateExpenseAsync(expenseId, expenseDto, userId);
+            }
+            return success ? NoContent() : NotFound();
         }
 
         [HttpDelete("{expenseId}")]
         public async Task<IActionResult> DeleteExpense(int expenseId)
         {
-            var userId = GetCurrentUserId();
-            var deleted = await _expenseService.DeleteExpenseAsync(expenseId, userId);
-            if (!deleted)
+            bool success;
+            if (User.IsInRole("Admin"))
             {
-                return NotFound();
+                success = await _expenseService.DeleteExpensesAsAdminAsync(expenseId);
             }
-            return NoContent();
+            else
+            {
+                var userId = GetCurrentUserId();
+                success = await _expenseService.DeleteExpenseAsync(expenseId, userId);
+            }
+            return success ? NoContent() : NotFound();
         }
     }
 }

@@ -10,7 +10,6 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
         private readonly NavigationService _navigationService;
         private readonly TaskDto? _editingTask;
         private readonly int _weddingId;
-        private readonly bool _isAdminMode;
 
         private bool _formSubmitAttempted = false;
 
@@ -73,7 +72,7 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
 
         public event Func<Task> RefreshParentRequested;
 
-        public AddEditTasksViewModel(ApiClientService apiClient, NavigationService navigationService, int weddingId, TaskDto? task = null, bool isAdminMode = false)
+        public AddEditTasksViewModel(ApiClientService apiClient, NavigationService navigationService, int weddingId, TaskDto? task = null)
         {
             _apiClient = apiClient;
             _navigationService = navigationService;
@@ -101,7 +100,6 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
                 OnPropertyChanged(nameof(CanSave));
                 OnPropertyChanged(nameof(ShowValidationSummary));
             };
-            _isAdminMode = isAdminMode;
         }
 
         public void GoBack()
