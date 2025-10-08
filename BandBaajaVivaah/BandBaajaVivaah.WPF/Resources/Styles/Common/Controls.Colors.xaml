@@ -4,5 +4,8 @@
     <SolidColorBrush x:Key="PrimaryBrush" Color="#4A148C"/>
     <SolidColorBrush x:Key="LightBrush" Color="#E1BEE7"/>
     <SolidColorBrush x:Key="TextBrush" Color="#FFFFFF"/>
-    
+    <SolidColorBrush x:Key="BrushOnPageToolBarBackground" Color="DarkOrange"/>
+    <SolidColorBrush x:Key="BrushOnPageToolBarForeground" Color="Black"/>
+    <SolidColorBrush x:Key="BrushOnPageToolBarClickableBackground" Color="Red"/>
+
 </ResourceDictionary>

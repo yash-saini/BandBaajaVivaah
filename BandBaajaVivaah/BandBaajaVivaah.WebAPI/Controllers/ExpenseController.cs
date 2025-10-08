@@ -49,14 +49,55 @@ namespace BandBaajaVivaah.Api.Controllers
         {
             try
             {
-                var userId = GetCurrentUserId();
-                var createdExpense = await _expenseService.CreateExpenseAsync(expenseDto, userId);
-                return Ok(createdExpense);
+                if (User.IsInRole("Admin"))
+                {
+                    var createdExpense = await _expenseService.CreateExpensesAsAdminAsync(expenseDto);
+                    return Ok(createdExpense);
+                }
+                else
+                {
+                    var userId = GetCurrentUserId();
+                    var createdExpense = await _expenseService.CreateExpenseAsync(expenseDto, userId);
+                    return Ok(createdExpense);
+                }
             }
             catch (UnauthorizedAccessException ex)
             {
                 return Forbid(ex.Message);
             }
+        }
+
+        [HttpPut("{expenseId}")]
+        public async Task<IActionResult> UpdateExpense(int expenseId, [FromBody] CreateExpenseDto expenseDto)
+        {
+            bool success;
+            if (User.IsInRole("Admin"))
+            {
+                success = await _expenseService.UpdateExpensesAsAdminAsync(expenseId, expenseDto);
+            }
+            else
+            {
+
+               var userId = GetCurrentUserId();
+               success = await _expenseService.UpdateExpenseAsync(expenseId, expenseDto, userId);
+            }
+            return success ? NoContent() : NotFound();
+        }
+
+        [HttpDelete("{expenseId}")]
+        public async Task<IActionResult> DeleteExpense(int expenseId)
+        {
+            bool success;
+            if (User.IsInRole("Admin"))
+            {
+                success = await _expenseService.DeleteExpensesAsAdminAsync(expenseId);
+            }
+            else
+            {
+                var userId = GetCurrentUserId();
+                success = await _expenseService.DeleteExpenseAsync(expenseId, userId);
+            }
+            return success ? NoContent() : NotFound();
         }
     }
 }
