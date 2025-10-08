@@ -1,4 +1,5 @@
-﻿using BandBaajaVivaah.Contracts.DTOs;
+﻿using BandBaajaVivaah.Contracts.DTO;
+using BandBaajaVivaah.Contracts.DTOs;
 using BandBaajaVivaah.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,13 +16,15 @@ namespace BandBaajaVivaah.WebAPI.Controllers
         private readonly IWeddingService _weddingService;
         private readonly IGuestService _guestService;
         private readonly ITaskService _taskService;
+        private readonly IExpenseService _expenseService;
 
-        public AdminController(IUserService userService, IWeddingService weddingService, IGuestService guestService, ITaskService taskService)
+        public AdminController(IUserService userService, IWeddingService weddingService, IGuestService guestService, ITaskService taskService, IExpenseService expenseService)
         {
             _userService = userService;
             _weddingService = weddingService;
             _guestService = guestService;
             _taskService = taskService;
+            _expenseService = expenseService;
         }
 
         private int GetCurrentUserId()
@@ -301,6 +304,89 @@ namespace BandBaajaVivaah.WebAPI.Controllers
             {
                 var adminUserId = GetCurrentUserId();
                 var success = await _guestService.UpdateGuestAsync(guestId, updateDto, adminUserId);
+                if (!success)
+                {
+                    return NotFound();
+                }
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpGet("weddings/{weddingId}/expenses")]
+        public async Task<IActionResult> GetExpensesForWedding(int weddingId)
+        {
+            try
+            {
+                // First validate that the wedding exists
+                var wedding = await _weddingService.GetWeddingByIdAsync(weddingId, null); // null for admin mode
+                if (wedding == null)
+                {
+                    return NotFound(new { Message = "Wedding not found" });
+                }
+                var adminUserId = GetCurrentUserId();
+                var expenses = await _expenseService.GetExpensesByWeddingIdAsync(weddingId, adminUserId);
+                return Ok(expenses);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = ex.Message });
+            }
+        }
+
+        [HttpPost("weddings/{weddingId}/expenses")]
+        public async Task<IActionResult> AddExpenseToWedding(int weddingId, [FromBody] CreateExpenseDto expenseDto)
+        {
+            try
+            {
+                // Ensure weddingId is set in the DTO
+                expenseDto.WeddingID = weddingId;
+                // Get the current admin's user ID
+                var adminUserId = GetCurrentUserId();
+                var wedding = await _weddingService.GetWeddingByIdAsync(weddingId, null);
+                if (wedding == null)
+                {
+                    return NotFound(new { Message = "Wedding not found" });
+                }
+                // Use the admin's ID for permission override
+                var expense = await _expenseService.CreateExpenseAsync(expenseDto, adminUserId);
+                return CreatedAtAction("GetExpenseById", "Expenses", new { expenseId = expense.ExpenseID }, expense);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = ex.Message });
+            }
+        }
+
+        [HttpDelete("expenses/{expenseId}")]
+        public async Task<IActionResult> DeleteExpense(int expenseId)
+        {
+            try
+            {
+                var adminUserId = GetCurrentUserId();
+                var success = await _expenseService.DeleteExpenseAsync(expenseId, adminUserId);
+                if (!success)
+                {
+                    return NotFound();
+                }
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpPut("expenses/{expenseId}")]
+        public async Task<IActionResult> UpdateExpense(int expenseId, [FromBody] CreateExpenseDto updateDto)
+        {
+            try
+            {
+                var adminUserId = GetCurrentUserId();
+                var success = await _expenseService.UpdateExpenseAsync(expenseId, updateDto, adminUserId);
                 if (!success)
                 {
                     return NotFound();
