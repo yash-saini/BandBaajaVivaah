@@ -95,8 +95,6 @@ namespace BandBaajaVivaah.WPF.ViewModel
             if (tasksList != null)
             {
                 AllItems = tasksList.ToList();
-                Tasks = new ObservableCollection<TaskDto>(AllItems);
-                CurrentPage = 1;
                 UpdateDisplayedItems();
             }
         }

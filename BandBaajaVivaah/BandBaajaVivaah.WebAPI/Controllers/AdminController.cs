@@ -14,12 +14,14 @@ namespace BandBaajaVivaah.WebAPI.Controllers
         private readonly IUserService _userService;
         private readonly IWeddingService _weddingService;
         private readonly IGuestService _guestService;
+        private readonly ITaskService _taskService;
 
-        public AdminController(IUserService userService, IWeddingService weddingService, IGuestService guestService)
+        public AdminController(IUserService userService, IWeddingService weddingService, IGuestService guestService, ITaskService taskService)
         {
             _userService = userService;
             _weddingService = weddingService;
             _guestService = guestService;
+            _taskService = taskService;
         }
 
         private int GetCurrentUserId()
@@ -138,6 +140,92 @@ namespace BandBaajaVivaah.WebAPI.Controllers
             }
             return NoContent();
         }
+
+        [HttpGet("weddings/{weddingId}/tasks")]
+        public async Task<IActionResult> GetTasksForWedding(int weddingId)
+        {
+            try
+            {
+                // First validate that the wedding exists
+                var wedding = await _weddingService.GetWeddingByIdAsync(weddingId, null); // null for admin mode
+                if (wedding == null)
+                {
+                    return NotFound(new { Message = "Wedding not found" });
+                }
+                var adminUserId = GetCurrentUserId();
+                var tasks = await _taskService.GetTasksByWeddingIdAsync(weddingId, adminUserId);
+                return Ok(tasks);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = ex.Message });
+            }
+        }
+
+        [HttpPost("weddings/{weddingId}/tasks")]
+        public async Task<IActionResult> AddTaskToWedding(int weddingId, [FromBody] CreateTaskDto taskDto)
+        {
+            try
+            {
+                // Ensure weddingId is set in the DTO
+                taskDto.WeddingID = weddingId;
+
+                // Get the current admin's user ID
+                var adminUserId = GetCurrentUserId();
+                var wedding = await _weddingService.GetWeddingByIdAsync(weddingId, null);
+                if (wedding == null)
+                {
+                    return NotFound(new { Message = "Wedding not found" });
+                }
+
+                // Use the admin's ID for permission override
+                var task = await _taskService.CreateTaskAsync(taskDto, adminUserId);
+                return CreatedAtAction("GetTaskById", "Tasks", new { taskId = task.TaskID }, task);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = ex.Message });
+            }
+        }
+
+        [HttpDelete("tasks/{taskId}")]
+        public async Task<IActionResult> DeleteTask(int taskId)
+        {
+            try
+            {
+                var adminUserId = GetCurrentUserId();
+                var success = await _taskService.DeleteTaskAsync(taskId, adminUserId);
+                if (!success)
+                {
+                    return NotFound();
+                }
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpPut("tasks/{taskId}")]
+        public async Task<IActionResult> UpdateTask(int taskId, [FromBody] CreateTaskDto updateDto)
+        {
+            try
+            {
+                var adminUserId = GetCurrentUserId();
+                var success = await _taskService.UpdateTaskAsync(taskId, updateDto, adminUserId);
+                if (!success)
+                {
+                    return NotFound();
+                }
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
 
         [HttpGet("weddings/{weddingId}/guests")]
         public async Task<IActionResult> GetGuestsForWedding(int weddingId)

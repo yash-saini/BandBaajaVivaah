@@ -143,7 +143,7 @@ namespace BandBaajaVivaah.WPF.ViewModel
         {
             if (obj is WeddingDto wedding)
             {
-                var guestPage = new GuestsView(_apiClient, _navigationService, wedding.WeddingID, IsAdminMode);
+                var guestPage = new GuestsView(_apiClient, _navigationService, wedding.WeddingID);
                 _navigationService.NavigateTo(guestPage);
             }
         }

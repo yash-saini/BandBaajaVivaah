@@ -17,7 +17,7 @@ namespace BandBaajaVivaah.WPF.Views.Pages
         private readonly NavigationService _navigationService;
         private readonly int _weddingId;
 
-        public GuestsView(ApiClientService apiClient, NavigationService navigationService, int weddingId, bool isAdminMode = false)
+        public GuestsView(ApiClientService apiClient, NavigationService navigationService, int weddingId)
         {
             InitializeComponent();
             _apiClient = apiClient;
