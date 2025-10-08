@@ -45,9 +45,17 @@ public class TasksController : ControllerBase
     {
         try
         {
-            var userId = GetCurrentUserId();
-            var createdTask = await _taskService.CreateTaskAsync(taskDto, userId);
-            return Ok(createdTask);
+            if (User.IsInRole("Admin"))
+            {
+                var createdGuest = await _taskService.CreateTasksAsAdminAsync(taskDto);
+                return Ok(createdGuest);
+            }
+            else
+            {
+                var userId = GetCurrentUserId();
+                var createdTask = await _taskService.CreateTaskAsync(taskDto, userId);
+                return Ok(createdTask);
+            }
         }
         catch (UnauthorizedAccessException ex)
         {
@@ -58,38 +66,37 @@ public class TasksController : ControllerBase
     [HttpPut("{taskId}")]
     public async Task<IActionResult> UpdateTask(int taskId, [FromBody] CreateTaskDto updateDto)
     {
-        try
+        bool success;
+        if (User.IsInRole("Admin"))
+        {
+            success = await _taskService.UpdateTasksAsAdminAsync(taskId, updateDto);
+        }
+        else
         {
             var userId = GetCurrentUserId();
-            var success = await _taskService.UpdateTaskAsync(taskId, updateDto, userId);
-            if (!success)
-            {
-                return NotFound();
-            }
-            return NoContent();
+            success = await _taskService.UpdateTaskAsync(taskId, updateDto, userId);
         }
-        catch (UnauthorizedAccessException ex)
-        {
-            return Forbid(ex.Message);
-        }
+        return success ? NoContent() : NotFound();
     }
 
     [HttpDelete("{taskId}")]
     public async Task<IActionResult> DeleteTask(int taskId)
     {
-        try
+        bool success;
+        if (User.IsInRole("Admin"))
+        {
+            success = await _taskService.DeleteTasksAsAdminAsync(taskId);
+        }
+        else
         {
             var userId = GetCurrentUserId();
-            var success = await _taskService.DeleteTaskAsync(taskId, userId);
+            success = await _taskService.DeleteTaskAsync(taskId, userId);
             if (!success)
             {
                 return NotFound();
             }
-            return NoContent();
         }
-        catch (UnauthorizedAccessException ex)
-        {
-            return Forbid(ex.Message);
-        }
+        return success ? NoContent() : NotFound();
     }
+    
 }

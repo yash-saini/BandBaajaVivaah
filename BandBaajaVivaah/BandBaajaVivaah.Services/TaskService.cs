@@ -9,6 +9,10 @@ namespace BandBaajaVivaah.Services
         Task<TaskDto> CreateTaskAsync(CreateTaskDto taskDto, int userId);
         Task<bool> UpdateTaskAsync(int taskId, CreateTaskDto taskDto, int userId);
         Task<bool> DeleteTaskAsync(int taskId, int userId);
+
+        Task<TaskDto> CreateTasksAsAdminAsync(CreateTaskDto taskDto);
+        Task<bool> UpdateTasksAsAdminAsync(int taskId, CreateTaskDto taskDto);
+        Task<bool> DeleteTasksAsAdminAsync(int taskId);
     }
 
     public class TaskService : ITaskService
@@ -29,6 +33,11 @@ namespace BandBaajaVivaah.Services
                 throw new UnauthorizedAccessException("You are not authorized to add a task to this wedding.");
             }
 
+            return await CreateTasksAsAdminAsync(taskDto);
+        }
+
+        public async Task<TaskDto> CreateTasksAsAdminAsync(CreateTaskDto taskDto)
+        {
             var task = new BandBaaajaVivaah.Data.Models.Task
             {
                 Title = taskDto.Title,
@@ -54,9 +63,12 @@ namespace BandBaajaVivaah.Services
         public async Task<IEnumerable<TaskDto>> GetTasksByWeddingIdAsync(int weddingId, int userId)
         {
             var wedding = await _unitOfWork.Weddings.GetByIdAsync(weddingId);
-            if (wedding == null || wedding.OwnerUserId != userId)
+            var user = await _unitOfWork.Users.GetByIdAsync(userId);
+            bool isAdmin = user?.Role?.Equals("Admin", StringComparison.OrdinalIgnoreCase) == true;
+
+            if (wedding == null || (!isAdmin && wedding.OwnerUserId != userId))
             {
-                throw new UnauthorizedAccessException("You are not authorized to view tasks for this wedding.");
+                throw new UnauthorizedAccessException("You are not authorized to view guests for this wedding.");
             }
 
             var tasks = await _unitOfWork.Tasks.FindAllAsync(t => t.WeddingId == weddingId); // Requires custom repository method
@@ -82,11 +94,20 @@ namespace BandBaajaVivaah.Services
             {
                 return false;
             }
+            return await UpdateTasksAsAdminAsync(taskId, taskDto);
+        }
+
+        public async Task<bool> UpdateTasksAsAdminAsync(int taskId, CreateTaskDto taskDto)
+        {
+            var task = await _unitOfWork.Tasks.GetByIdAsync(taskId);
+            if (task == null)
+            {
+                return false;
+            }
             task.Title = taskDto.Title;
             task.Description = taskDto.Description;
             task.DueDate = taskDto.DueDate;
             task.Status = taskDto.Status;
-
             await _unitOfWork.CompleteAsync();
             return true;
         }
@@ -100,6 +121,16 @@ namespace BandBaajaVivaah.Services
             }
             var wedding = await _unitOfWork.Weddings.GetByIdAsync(task.WeddingId);
             if (wedding == null || wedding.OwnerUserId != userId)
+            {
+                return false;
+            }
+            return await DeleteTasksAsAdminAsync(taskId);
+        }
+
+        public async Task<bool> DeleteTasksAsAdminAsync(int taskId)
+        {
+            var task = await _unitOfWork.Tasks.GetByIdAsync(taskId);
+            if (task == null)
             {
                 return false;
             }
