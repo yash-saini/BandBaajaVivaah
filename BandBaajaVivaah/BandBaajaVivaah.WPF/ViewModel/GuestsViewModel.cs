@@ -92,11 +92,10 @@ namespace BandBaajaVivaah.WPF.ViewModel
         public override async Task LoadDataAsync()
         {
             var guestsList = await _apiClient.GetGuestsAsync(_weddingId);
+
             if (guestsList != null)
             {
                 AllItems = guestsList.ToList();
-                Guests = new ObservableCollection<GuestDto>(AllItems);
-                CurrentPage = 1;
                 UpdateDisplayedItems();
             }
         }
@@ -132,26 +131,24 @@ namespace BandBaajaVivaah.WPF.ViewModel
             }
 
             ShowConfirmationRequested?.Invoke(this,
-                ($"Are you sure you want to delete the Guest - {SelectedItem.FirstName} {SelectedItem.LastName}?",
-                 "Confirm Delete",
-                 async (confirmed) =>
-                 {
-                     if (confirmed)
-                     {
-                         var success = await _apiClient.DeleteGuestAsync(SelectedItem.GuestID);
-                         if (success)
-                         {
-                             await LoadDataAsync(); // Reload all data
-                             SelectedItem = null;
-                         }
-                         else
-                         {
-                             ShowMessageRequested?.Invoke(this, "Failed to delete the Guest. Please try again.");
-                         }
-                     }
-                 }
+                ($"Are you sure you want to delete {SelectedItem.FirstName}?", "Confirm Delete",
+                async (confirmed) =>
+                {
+                    if (confirmed)
+                    {
+                        // Always call the standard DeleteGuestAsync.
+                        var success = await _apiClient.DeleteGuestAsync(SelectedItem.GuestID);
+                        if (success)
+                        {
+                            await LoadDataAsync();
+                        }
+                        else
+                        {
+                            ShowMessageRequested?.Invoke(this, "Failed to delete the Guest.");
+                        }
+                    }
+                }
             ));
         }
-
     }
 }
