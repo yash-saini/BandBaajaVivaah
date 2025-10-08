@@ -208,8 +208,7 @@ namespace BandBaajaVivaah.WPF.Services
                 var response = await _httpClient.GetAsync($"api/guests/wedding/{weddingId}");
                 if (response.IsSuccessStatusCode)
                 {
-                    var guests = await response.Content.ReadFromJsonAsync<IEnumerable<GuestDto>>();
-                    return guests ?? new List<GuestDto>();
+                    return await response.Content.ReadFromJsonAsync<IEnumerable<GuestDto>>() ?? new List<GuestDto>();
                 }
             }
             catch (HttpRequestException)

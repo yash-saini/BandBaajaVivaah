@@ -13,11 +13,13 @@ namespace BandBaajaVivaah.WebAPI.Controllers
     {
         private readonly IUserService _userService;
         private readonly IWeddingService _weddingService;
+        private readonly IGuestService _guestService;
 
-        public AdminController(IUserService userService, IWeddingService weddingService)
+        public AdminController(IUserService userService, IWeddingService weddingService, IGuestService guestService)
         {
             _userService = userService;
             _weddingService = weddingService;
+            _guestService = guestService;
         }
 
         private int GetCurrentUserId()
@@ -135,6 +137,92 @@ namespace BandBaajaVivaah.WebAPI.Controllers
                 return NotFound();
             }
             return NoContent();
+        }
+
+        [HttpGet("weddings/{weddingId}/guests")]
+        public async Task<IActionResult> GetGuestsForWedding(int weddingId)
+        {
+            try
+            {
+                // First validate that the wedding exists
+                var wedding = await _weddingService.GetWeddingByIdAsync(weddingId, null); // null for admin mode
+                if (wedding == null)
+                {
+                    return NotFound(new { Message = "Wedding not found" });
+                }
+
+                var adminUserId = GetCurrentUserId();
+                var guests = await _guestService.GetGuestsByWeddingIdAsync(weddingId, adminUserId);
+                return Ok(guests);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = ex.Message });
+            }
+        }
+
+        [HttpPost("weddings/{weddingId}/guests")]
+        public async Task<IActionResult> AddGuestToWedding(int weddingId, [FromBody] CreateGuestDto guestDto)
+        {
+            try
+            {
+                // Ensure weddingId is set in the DTO
+                guestDto.WeddingID = weddingId;
+
+                // Get the current admin's user ID
+                var adminUserId = GetCurrentUserId();
+                var wedding = await _weddingService.GetWeddingByIdAsync(weddingId, null);
+                if (wedding == null)
+                {
+                    return NotFound(new { Message = "Wedding not found" });
+                }
+
+                // Use the admin's ID for permission override
+                var guest = await _guestService.CreateGuestAsync(guestDto, adminUserId);
+                return CreatedAtAction("GetGuestById", "Guests", new { guestId = guest.GuestID }, guest);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = ex.Message });
+            }
+        }
+
+        [HttpDelete("guests/{guestId}")]
+        public async Task<IActionResult> DeleteGuest(int guestId)
+        {
+            try
+            {
+                var adminUserId = GetCurrentUserId();
+                var success = await _guestService.DeleteGuestAsync(guestId, adminUserId);
+                if (!success)
+                {
+                    return NotFound();
+                }
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpPut("guests/{guestId}")]
+        public async Task<IActionResult> UpdateGuest(int guestId, [FromBody] CreateGuestDto updateDto)
+        {
+            try
+            {
+                var adminUserId = GetCurrentUserId();
+                var success = await _guestService.UpdateGuestAsync(guestId, updateDto, adminUserId);
+                if (!success)
+                {
+                    return NotFound();
+                }
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
     }
 

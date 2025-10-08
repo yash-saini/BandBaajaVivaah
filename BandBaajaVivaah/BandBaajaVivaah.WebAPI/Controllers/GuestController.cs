@@ -48,9 +48,17 @@ namespace BandBaajaVivaah.Api.Controllers
         {
             try
             {
-                var userId = GetCurrentUserId();
-                var createdGuest = await _guestService.CreateGuestAsync(guestDto, userId);
-                return Ok(createdGuest);
+                if (User.IsInRole("Admin"))
+                {
+                    var createdGuest = await _guestService.CreateGuestAsAdminAsync(guestDto);
+                    return Ok(createdGuest);
+                }
+                else
+                {
+                    var userId = GetCurrentUserId();
+                    var createdGuest = await _guestService.CreateGuestAsync(guestDto, userId);
+                    return Ok(createdGuest);
+                }
             }
             catch (UnauthorizedAccessException ex)
             {
@@ -61,25 +69,35 @@ namespace BandBaajaVivaah.Api.Controllers
         [HttpPut("{guestId}")]
         public async Task<IActionResult> UpdateGuest(int guestId, [FromBody] CreateGuestDto guestDto)
         {
-            var userId = GetCurrentUserId();
-            var success = await _guestService.UpdateGuestAsync(guestId, guestDto, userId);
-            if (!success)
+            bool success;
+            if (User.IsInRole("Admin"))
             {
-                return NotFound();
+                success = await _guestService.UpdateGuestAsAdminAsync(guestId, guestDto);
             }
-            return NoContent();
+            else
+            {
+                var userId = GetCurrentUserId();
+                success = await _guestService.UpdateGuestAsync(guestId, guestDto, userId);
+            }
+
+            return success ? NoContent() : NotFound();
         }
 
         [HttpDelete("{guestId}")]
         public async Task<IActionResult> DeleteGuest(int guestId)
         {
-            var userId = GetCurrentUserId();
-            var success = await _guestService.DeleteGuestAsync(guestId, userId);
-            if (!success)
+            bool success;
+            if (User.IsInRole("Admin"))
             {
-                return NotFound();
+                success = await _guestService.DeleteGuestAsAdminAsync(guestId);
             }
-            return NoContent();
+            else
+            {
+                var userId = GetCurrentUserId();
+                success = await _guestService.DeleteGuestAsync(guestId, userId);
+            }
+
+            return success ? NoContent() : NotFound();
         }
     }
 }

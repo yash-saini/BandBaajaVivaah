@@ -1,7 +1,6 @@
 ﻿using BandBaajaVivaah.Contracts.DTOs;
 using BandBaajaVivaah.WPF.Services;
 using BandBaajaVivaah.WPF.ViewModel.Base;
-using System.Windows;
 
 namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
 {
@@ -11,6 +10,7 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
         private readonly NavigationService _navigationService;
         private readonly GuestDto? _editingGuests;
         private readonly int _weddingId;
+        private readonly bool _isAdminMode;
 
         private bool _formSubmitAttempted = false;
 
@@ -71,12 +71,13 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
 
         public event Func<Task> RefreshParentRequested;
 
-        public AddEditGuestsViewModel(ApiClientService apiClient, NavigationService navigationService, int weddingId, GuestDto? guest = null)
+        public AddEditGuestsViewModel(ApiClientService apiClient, NavigationService navigationService, int weddingId, GuestDto? guest = null, bool isAdminMode = false)
         {
             _apiClient = apiClient;
             _navigationService = navigationService;
             _editingGuests = guest;
             _weddingId = weddingId;
+            _isAdminMode = isAdminMode;
 
             if (_editingGuests != null)
             {
@@ -99,6 +100,7 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
                 OnPropertyChanged(nameof(CanSave));
                 OnPropertyChanged(nameof(ShowValidationSummary));
             };
+            _isAdminMode = isAdminMode;
         }
 
         public void GoBack()
@@ -129,12 +131,12 @@ namespace BandBaajaVivaah.WPF.ViewModel.AddEditViewModel
             };
 
             bool success;
-            if (_editingGuests == null) // Add Mode
+            if (_editingGuests == null) // Add mode
             {
-                var newGuest = await _apiClient.CreateGuestAsync(dto);
-                success = newGuest != null;
+                var result = await _apiClient.CreateGuestAsync(dto);
+                success = result != null;
             }
-            else // Edit Mode
+            else // Edit mode
             {
                 success = await _apiClient.UpdateGuestAsync(_editingGuests.GuestID, dto);
             }
