@@ -17,6 +17,7 @@ namespace BandBaajaVivaah.WPF
 
             var apiClient = new ApiClientService();
             var navigationService = new NavigationService();
+            var themeService = new ThemeService();
 
             // This loop will continue until the user closes the app without logging out
             while (true)
@@ -41,7 +42,7 @@ namespace BandBaajaVivaah.WPF
                 // If the login was successful...
                 if (loginViewModel.IsLoginSuccessful)
                 {
-                    var mainViewModel = new MainViewModel(apiClient, navigationService, loginViewModel.Email, loginViewModel.Role);
+                    var mainViewModel = new MainViewModel(apiClient, navigationService, loginViewModel.Email, themeService,loginViewModel.Role);
                     var mainView = new MainWindow
                     {
                         DataContext = mainViewModel
