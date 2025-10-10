@@ -23,12 +23,13 @@ namespace BandBaajaVivaah.WPF.ViewModel
         public bool IsLoggingOut { get; private set; } = false;
         public Action CloseWindow { get; set; }
 
-        public MainViewModel(ApiClientService apiClient, NavigationService navigationService, string userName, string role = "User")
+        public MainViewModel(ApiClientService apiClient, NavigationService navigationService, string userName, ThemeService themeService, string role = "User")
         {
             _apiClient = apiClient;
             _navigationService = navigationService;
             CurrentUserName = userName;
             WelcomeMessage = $"Welcome, {userName.Split('@')[0]}!";
+
 
             IsAdmin = role == "Admin";
 
@@ -40,7 +41,7 @@ namespace BandBaajaVivaah.WPF.ViewModel
                 _ => IsAdmin);
 
 
-            ToolbarViewModel = new ToolbarViewModel(userName);
+            ToolbarViewModel = new ToolbarViewModel(userName, themeService);
             ToolbarViewModel.CloseWindow = () => Logout();
         }
 

@@ -9,7 +9,7 @@
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:converters="clr-namespace:BandBaajaVivaah.WPF.Converters"
              d:DesignWidth="800"
-             Background="DarkOrange" Height="33">
+             Background="{DynamicResource AddEditToolBarColor}" Height="33">
     
     <UserControl.Resources>
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
@@ -24,6 +24,7 @@
             <Button x:Name="BackButton" Click="BackButton_Click"
                     Style="{StaticResource Styles.ButtonOnPageToolBar}" 
                     Margin="5,0,20,0"
+                    Background="{DynamicResource AddEditToolBarColor}"
                     ToolTip="Back to Dashboard">
                 <iconPacks:PackIconMaterial Kind="ArrowLeft" Width="24" Height="10"/>
             </Button>
@@ -31,6 +32,7 @@
             <Button x:Name="DeleteButton" Click="DeleteButton_Click"
                     Style="{StaticResource Styles.ButtonOnPageToolBar}"
                     Padding="10,5"
+                     Background="{DynamicResource AddEditToolBarColor}"
                     IsEnabled="{Binding Path=IsDeleteEnabled, RelativeSource={RelativeSource AncestorType=local:AdminToolBarView}}"
                     >
                 <StackPanel Orientation="Horizontal">
@@ -39,7 +41,7 @@
                 </StackPanel>
             </Button>
 
-            <Button Click="RefreshButton_Click" Style="{StaticResource Styles.ButtonOnPageToolBar}" Padding="10,5">
+            <Button Click="RefreshButton_Click" Style="{StaticResource Styles.ButtonOnPageToolBar}" Padding="10,5" Background="{DynamicResource AddEditToolBarColor}">
                 <StackPanel Orientation="Horizontal">
                     <iconPacks:PackIconMaterial Kind="Refresh" VerticalAlignment="Center" Margin="0,0,5,0"/>
                     <Label Content="Refresh" Style="{StaticResource Styles.Label}" Margin="0" Padding="0"/>
@@ -48,12 +50,12 @@
         </StackPanel>
 
         <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0">
-            <Button x:Name="FirstPageButton" Click="FirstPageButton_Click"
+            <Button x:Name="FirstPageButton" Click="FirstPageButton_Click" Background="{DynamicResource AddEditToolBarColor}"
                     IsEnabled="{Binding Path=IsFirstPage, RelativeSource={RelativeSource AncestorType=local:AdminToolBarView}, Converter={StaticResource InverseBooleanConverter}}" 
                     Style="{StaticResource Styles.ButtonOnPageToolBar}" ToolTip="First Page">
                 <iconPacks:PackIconMaterial Kind="PageFirst" />
             </Button>
-            <Button x:Name="PreviousPageButton" Click="PreviousPageButton_Click" 
+            <Button x:Name="PreviousPageButton" Click="PreviousPageButton_Click" Background="{DynamicResource AddEditToolBarColor}"
                     IsEnabled="{Binding Path=IsFirstPage, RelativeSource={RelativeSource AncestorType=local:AdminToolBarView}, Converter={StaticResource InverseBooleanConverter}}" 
                     Style="{StaticResource Styles.ButtonOnPageToolBar}" ToolTip="Previous Page">
                 <iconPacks:PackIconMaterial Kind="ChevronLeft" />
@@ -68,12 +70,12 @@
                 </TextBlock.Text>
             </TextBlock>
 
-            <Button x:Name="NextPageButton" Click="NextPageButton_Click"
+            <Button x:Name="NextPageButton" Click="NextPageButton_Click" Background="{DynamicResource AddEditToolBarColor}"
                     IsEnabled="{Binding Path=IsLastPage, RelativeSource={RelativeSource AncestorType=local:AdminToolBarView}, Converter={StaticResource InverseBooleanConverter}}" 
                     Style="{StaticResource Styles.ButtonOnPageToolBar}" ToolTip="Next Page">
                 <iconPacks:PackIconMaterial Kind="ChevronRight" />
             </Button>
-            <Button x:Name="LastPageButton" Click="LastPageButton_Click"
+            <Button x:Name="LastPageButton" Click="LastPageButton_Click" Background="{DynamicResource AddEditToolBarColor}"
                     IsEnabled="{Binding Path=IsLastPage, RelativeSource={RelativeSource AncestorType=local:AdminToolBarView}, Converter={StaticResource InverseBooleanConverter}}" 
                     Style="{StaticResource Styles.ButtonOnPageToolBar}" ToolTip="Last Page">
                 <iconPacks:PackIconMaterial Kind="PageLast" />
