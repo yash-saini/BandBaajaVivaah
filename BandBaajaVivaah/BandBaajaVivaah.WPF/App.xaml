@@ -17,6 +17,8 @@
                 <ResourceDictionary Source="Resources/Styles/Common/Controls.DatePicker.xaml"/>
                 <ResourceDictionary Source="Resources/Styles/Common/Controls.DataGrid.xaml"/>
                 <ResourceDictionary Source="Resources/Styles/Common/Controls.ValidationStyle.xaml"/>
+                <ResourceDictionary Source="/Resources/Styles/Common/Controls.Checkbox.xaml"/>
+                <ResourceDictionary x:Name="ThemeDictionary" Source="/Resources/Styles/Themes/Light.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
