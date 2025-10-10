@@ -7,7 +7,7 @@
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:converters="clr-namespace:BandBaajaVivaah.WPF.Converters"
              mc:Ignorable="d" d:DesignWidth="800"
-             Background="DarkOrange" Height="33">
+             Background="{DynamicResource AddEditToolBarColor}" Height="33">
 
     <UserControl.Resources>
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
@@ -23,18 +23,19 @@
             <Button x:Name="BackButton" Click="BackButton_Click"
                     Style="{StaticResource Styles.ButtonOnPageToolBar}" 
                     Margin="5,0,20,0"
+                    Background="{DynamicResource AddEditToolBarColor}"
                     ToolTip="Back to Dashboard">
                 <iconPacks:PackIconMaterial Kind="ArrowLeft" Width="24" Height="10"/>
             </Button>
 
-            <Button x:Name="AddButton" Click="AddButton_Click" Margin="5,0" Padding="10,5" Style="{StaticResource Styles.ButtonOnPageToolBar}">
+            <Button x:Name="AddButton" Background="{DynamicResource AddEditToolBarColor}" Click="AddButton_Click" Margin="5,0" Padding="10,5" Style="{StaticResource Styles.ButtonOnPageToolBar}">
                 <StackPanel Orientation="Horizontal">
                     <iconPacks:PackIconMaterial Kind="Plus" VerticalAlignment="Center" Margin="0,0,5,0"/>
                     <Label Content="Add New" Style="{StaticResource Styles.Label}" Margin="0" Padding="0"/>
                 </StackPanel>
             </Button>
 
-            <Button x:Name="DeleteButton" Click="DeleteButton_Click"
+            <Button x:Name="DeleteButton" Click="DeleteButton_Click" Background="{DynamicResource AddEditToolBarColor}"
                     Style="{StaticResource Styles.ButtonOnPageToolBar}"
                     Padding="10,5"
                     IsEnabled="{Binding Path=IsDeleteEnabled, RelativeSource={RelativeSource AncestorType=local:PageToolBarView}}">
@@ -44,7 +45,8 @@
                 </StackPanel>
             </Button>
 
-            <Button Click="RefreshButton_Click" Style="{StaticResource Styles.ButtonOnPageToolBar}" Padding="10,5">
+            <Button Click="RefreshButton_Click" Style="{StaticResource Styles.ButtonOnPageToolBar}" Background="{DynamicResource AddEditToolBarColor}"
+ Padding="10,5">
                 <StackPanel Orientation="Horizontal">
                     <iconPacks:PackIconMaterial Kind="Refresh" VerticalAlignment="Center" Margin="0,0,5,0"/>
                     <Label Content="Refresh" Style="{StaticResource Styles.Label}" Margin="0" Padding="0"/>
