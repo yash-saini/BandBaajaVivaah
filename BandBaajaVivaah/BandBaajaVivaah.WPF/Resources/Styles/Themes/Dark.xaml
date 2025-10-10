@@ -3,5 +3,6 @@
 
     <!-- Primary Colors -->
     <SolidColorBrush x:Key="ToolBarColor" Color="DarkOrange"/>
-    
+    <SolidColorBrush x:Key="AddEditToolBarColor" Color="OrangeRed"/>
+
 </ResourceDictionary>
