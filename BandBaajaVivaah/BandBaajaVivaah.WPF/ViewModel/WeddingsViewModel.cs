@@ -16,6 +16,7 @@ namespace BandBaajaVivaah.WPF.ViewModel
         private readonly NavigationService _navigationService;
         private readonly UserDto _targetUser;
         private readonly bool _isAdminMode;
+        private readonly GuestUpdateService _guestUpdateService;
         public bool IsAdminMode => _isAdminMode;
         public UserDto? TargetUser => _isAdminMode ? _targetUser : null;
 
@@ -68,6 +69,8 @@ namespace BandBaajaVivaah.WPF.ViewModel
         {
             _apiClient = apiClient;
             _navigationService = navigationService;
+            _guestUpdateService = new GuestUpdateService("https://localhost:7159");
+
             ManageGuestsCommand = new RelayCommand(NavigateToGuests);
             ManageTasksCommand = new RelayCommand(NavigateToTasks);
             ManageExpensesCommand = new RelayCommand(NavigateToExpenses);
@@ -143,7 +146,7 @@ namespace BandBaajaVivaah.WPF.ViewModel
         {
             if (obj is WeddingDto wedding)
             {
-                var guestPage = new GuestsView(_apiClient, _navigationService, wedding.WeddingID);
+                var guestPage = new GuestsView(_apiClient, _navigationService, wedding.WeddingID, _guestUpdateService);
                 _navigationService.NavigateTo(guestPage);
             }
         }

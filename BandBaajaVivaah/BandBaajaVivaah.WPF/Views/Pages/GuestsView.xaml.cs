@@ -15,18 +15,31 @@ namespace BandBaajaVivaah.WPF.Views.Pages
         GuestsViewModel? ViewModel => DataContext as GuestsViewModel;
         private readonly ApiClientService _apiClient;
         private readonly NavigationService _navigationService;
+        private readonly GuestUpdateService _guestUpdateService;
         private readonly int _weddingId;
 
-        public GuestsView(ApiClientService apiClient, NavigationService navigationService, int weddingId)
+        public GuestsView(ApiClientService apiClient, NavigationService navigationService, int weddingId, GuestUpdateService guestUpdateService)
         {
             InitializeComponent();
             _apiClient = apiClient;
             _weddingId = weddingId;
             _navigationService = navigationService;
-            var viewModel = new GuestsViewModel(_apiClient, _navigationService, weddingId);
+            _guestUpdateService = guestUpdateService;
+
+            var viewModel = new GuestsViewModel(_apiClient, _navigationService, weddingId, _guestUpdateService);
             viewModel.ShowMessageRequested += ViewModel_ShowMessageRequested;
             viewModel.ShowConfirmationRequested += ViewModel_ShowConfirmationRequested;
             DataContext = viewModel;
+
+            Unloaded += GuestsView_Unloaded;
+        }
+
+        private void GuestsView_Unloaded(object sender, RoutedEventArgs e)
+        {
+            if (ViewModel is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
         }
 
         private void ViewModel_ShowMessageRequested(object? sender, string message)

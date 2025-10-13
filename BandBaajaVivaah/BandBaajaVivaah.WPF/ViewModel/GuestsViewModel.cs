@@ -1,15 +1,21 @@
 ﻿using BandBaajaVivaah.Contracts.DTOs;
+using BandBaajaVivaah.Grpc;
 using BandBaajaVivaah.WPF.Services;
 using BandBaajaVivaah.WPF.ViewModel.Base;
 using System.Collections.ObjectModel;
+using System.Windows;
+using System.Windows.Threading;
+using GuestUpdateService = BandBaajaVivaah.WPF.Services.GuestUpdateService;
 
 namespace BandBaajaVivaah.WPF.ViewModel
 {
-    public class GuestsViewModel : PageViewModel<GuestDto>
+    public class GuestsViewModel : PageViewModel<GuestDto>, IDisposable
     {
         private readonly ApiClientService _apiClient;
         private readonly NavigationService _navigationService;
         private readonly int _weddingId;
+        private readonly GuestUpdateService _guestUpdateService;
+        private bool _isSubscribed = false;
 
         public event EventHandler<string> ShowMessageRequested;
         public event EventHandler<(string Message, string Title, Action<bool> Callback)> ShowConfirmationRequested;
@@ -76,12 +82,96 @@ namespace BandBaajaVivaah.WPF.ViewModel
             }
         }
 
-        public GuestsViewModel(ApiClientService apiClient, NavigationService navigationService, int weddingId)
+        public GuestsViewModel(ApiClientService apiClient, NavigationService navigationService, int weddingId, GuestUpdateService guestUpdateService = null)
         {
             _apiClient = apiClient;
             _navigationService = navigationService;
             _weddingId = weddingId;
+            _guestUpdateService = guestUpdateService;
+
+            if (_guestUpdateService != null)
+            {
+                SubscribeToGuestUpdates();
+            }
+
             LoadDataAsync();
+        }
+
+        private async void SubscribeToGuestUpdates()
+        {
+            if (_isSubscribed)
+                return;
+
+            try
+            {
+                _guestUpdateService.OnGuestUpdate += OnGuestUpdateReceived;
+                await _guestUpdateService.SubscribeToWeddingUpdates(_weddingId);
+                _isSubscribed = true;
+            }
+            catch (Exception ex)
+            {
+                ShowMessageRequested?.Invoke(this, $"Failed to subscribe to real-time updates: {ex.Message}");
+            }
+        }
+
+        private void OnGuestUpdateReceived(object sender, GuestUpdateEvent e)
+        {
+            // Use dispatcher to ensure UI updates happen on the UI thread
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                var guestDto = new GuestDto
+                {
+                    GuestID = e.Guest.GuestId,
+                    FirstName = e.Guest.FirstName,
+                    LastName = e.Guest.LastName,
+                    Side = e.Guest.Side,
+                    RSVPStatus = e.Guest.RsvpStatus
+                };
+
+                switch (e.Type)
+                {
+                    case GuestUpdateEvent.Types.UpdateType.Created:
+                        HandleGuestCreated(guestDto);
+                        break;
+                    case GuestUpdateEvent.Types.UpdateType.Updated:
+                        HandleGuestUpdated(guestDto);
+                        break;
+                    case GuestUpdateEvent.Types.UpdateType.Deleted:
+                        HandleGuestDeleted(guestDto);
+                        break;
+                }
+            });
+        }
+
+        private void HandleGuestCreated(GuestDto guest)
+        {
+            if (AllItems.Any(g => g.GuestID == guest.GuestID))
+                return;
+
+            AllItems.Add(guest);
+            UpdateDisplayedItems();
+            ShowMessageRequested?.Invoke(this, $"New guest added: {guest.FirstName} {guest.LastName}");
+        }
+
+        private void HandleGuestUpdated(GuestDto guest)
+        {
+            var existingGuest = AllItems.FirstOrDefault(g => g.GuestID == guest.GuestID);
+            if (existingGuest != null)
+            {
+                var index = AllItems.IndexOf(existingGuest);
+                AllItems[index] = guest;
+                UpdateDisplayedItems();
+            }
+        }
+
+        private void HandleGuestDeleted(GuestDto guest)
+        {
+            var existingGuest = AllItems.FirstOrDefault(g => g.GuestID == guest.GuestID);
+            if (existingGuest != null)
+            {
+                AllItems.Remove(existingGuest);
+                UpdateDisplayedItems();
+            }
         }
 
         public void GoBack()
@@ -149,6 +239,16 @@ namespace BandBaajaVivaah.WPF.ViewModel
                     }
                 }
             ));
+        }
+
+        public void Dispose()
+        {
+            if (_guestUpdateService != null && _isSubscribed)
+            {
+                _guestUpdateService.OnGuestUpdate -= OnGuestUpdateReceived;
+                _guestUpdateService.Unsubscribe();
+                _isSubscribed = false;
+            }
         }
     }
 }

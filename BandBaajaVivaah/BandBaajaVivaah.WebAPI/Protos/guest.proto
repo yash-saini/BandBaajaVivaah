@@ -1,0 +1,33 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "BandBaajaVivaah.Grpc";
+
+package guestupdate;
+
+service GuestUpdateService {
+  rpc SubscribeToGuestUpdates(GuestUpdateSubscriptionRequest) returns (stream GuestUpdateEvent);
+}
+
+message GuestUpdateSubscriptionRequest {
+  int32 wedding_id = 1;
+}
+
+message GuestUpdateEvent {
+  enum UpdateType {
+    CREATED = 0;
+    UPDATED = 1;
+    DELETED = 2;
+  }
+  
+  UpdateType type = 1;
+  GuestDetails guest = 2;
+}
+
+message GuestDetails {
+  int32 guest_id = 1;
+  string first_name = 2;
+  string last_name = 3;
+  string side = 4;
+  string rsvp_status = 5;
+  int32 wedding_id = 6;
+}

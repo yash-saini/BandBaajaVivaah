@@ -1,6 +1,9 @@
 ﻿using BandBaaajaVivaah.Data.Models;
 using BandBaaajaVivaah.Data.Repositories;
 using BandBaajaVivaah.Contracts.DTOs;
+using BandBaajaVivaah.Grpc;
+using BandBaajaVivaah.Services.GrpcServices;
+using Task = System.Threading.Tasks.Task;
 
 namespace BandBaajaVivaah.Services
 {
@@ -47,7 +50,7 @@ namespace BandBaajaVivaah.Services
             };
             await _unitOfWork.Guests.AddAsync(guest);
             await _unitOfWork.CompleteAsync();
-            return new GuestDto
+            var result = new GuestDto
             {
                 GuestID = guest.GuestId,
                 FirstName = guest.FirstName,
@@ -55,6 +58,11 @@ namespace BandBaajaVivaah.Services
                 Side = guest.Side,
                 RSVPStatus = guest.Rsvpstatus
             };
+
+            // Notify subscribers about the new guest
+            await NotifyGuestChange(guest, GuestUpdateEvent.Types.UpdateType.Created);
+
+            return result;
         }
 
         public async Task<IEnumerable<GuestDto>> GetGuestsByWeddingIdAsync(int weddingId, int userId)
@@ -102,6 +110,8 @@ namespace BandBaajaVivaah.Services
             guest.Side = updateDto.Side;
             guest.Rsvpstatus = updateDto.RSVPStatus;
             await _unitOfWork.CompleteAsync();
+            await NotifyGuestChange(guest, GuestUpdateEvent.Types.UpdateType.Updated);
+
             return true;
         }
 
@@ -123,9 +133,44 @@ namespace BandBaajaVivaah.Services
             var guest = await _unitOfWork.Guests.GetByIdAsync(guestId);
             if (guest == null) return false;
 
+            // Store wedding ID and guest details before deletion for notification
+            var weddingId = guest.WeddingId;
+            var guestDetails = CreateGuestDetails(guest);
+
             await _unitOfWork.Guests.DeleteAsync(guestId);
             await _unitOfWork.CompleteAsync();
+
+            // Notify subscribers about the deleted guest
+            await GuestUpdateGrpcService.NotifyGuestChange(
+                weddingId,
+                GuestUpdateEvent.Types.UpdateType.Deleted,
+                guestDetails);
+
             return true;
+        }
+
+        private async Task NotifyGuestChange(Guest guest, GuestUpdateEvent.Types.UpdateType updateType)
+        {
+            var guestDetails = CreateGuestDetails(guest);
+
+            await GuestUpdateGrpcService.NotifyGuestChange(
+                guest.WeddingId,
+                updateType,
+                guestDetails);
+        }
+
+        // Helper to create gRPC GuestDetails object from Guest model
+        private GuestDetails CreateGuestDetails(Guest guest)
+        {
+            return new GuestDetails
+            {
+                GuestId = guest.GuestId,
+                FirstName = guest.FirstName,
+                LastName = guest.LastName,
+                Side = guest.Side,
+                RsvpStatus = guest.Rsvpstatus,
+                WeddingId = guest.WeddingId
+            };
         }
     }
 }
