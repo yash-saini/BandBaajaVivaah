@@ -18,6 +18,7 @@ namespace BandBaajaVivaah.WPF
             var apiClient = new ApiClientService();
             var navigationService = new NavigationService();
             var themeService = new ThemeService();
+            var guestUpdateService = new GuestUpdateService("https://localhost:7159");
 
             // This loop will continue until the user closes the app without logging out
             while (true)

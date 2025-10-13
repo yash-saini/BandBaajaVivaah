@@ -74,6 +74,7 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 });
+builder.Services.AddGrpc();
 
 var app = builder.Build();
 
@@ -90,5 +91,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
+app.MapGrpcService<BandBaajaVivaah.Services.GrpcServices.GuestUpdateGrpcService>();
 app.Run();

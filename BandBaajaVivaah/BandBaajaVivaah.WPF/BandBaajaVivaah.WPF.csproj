@@ -20,8 +20,18 @@
     <None Remove="Resources\Images\ResetPasswordFavicon.ico" />
     <None Remove="Resources\Images\trumpetFavicon.ico" />
   </ItemGroup>
+	
+	<ItemGroup>
+		<Protobuf Include="..\BandBaajaVivaah.WebAPI\Protos\guest.proto" GrpcServices="Client" Link="Protos\guest.proto" />
+	</ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.32.1" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.71.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.72.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="MahApps.Metro" Version="2.4.10" />
     <PackageReference Include="MahApps.Metro.IconPacks" Version="6.1.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.1.2" />

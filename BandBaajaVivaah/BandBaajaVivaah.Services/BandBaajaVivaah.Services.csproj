@@ -8,9 +8,19 @@
 
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="Google.Protobuf" Version="3.32.1" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.71.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.72.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="MailKit" Version="4.13.0" />
   </ItemGroup>
 
+	<ItemGroup>
+		<Protobuf Include="..\BandBaajaVivaah.WebAPI\Protos\guest.proto" GrpcServices="Server" Link="Protos\guest.proto" />
+	</ItemGroup>
+	
   <ItemGroup>
     <ProjectReference Include="..\BandBaaajaVivaah.Data\BandBaaajaVivaah.Data.csproj" />
     <ProjectReference Include="..\BandBaajaVivaah.Contracts\BandBaajaVivaah.Contracts.csproj" />
