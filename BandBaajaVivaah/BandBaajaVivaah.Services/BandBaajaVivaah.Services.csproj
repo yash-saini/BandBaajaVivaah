@@ -20,6 +20,10 @@
 	<ItemGroup>
 		<Protobuf Include="..\BandBaajaVivaah.WebAPI\Protos\guest.proto" GrpcServices="Server" Link="Protos\guest.proto" />
 	</ItemGroup>
+
+	<ItemGroup>
+		<Protobuf Include="..\BandBaajaVivaah.WebAPI\Protos\expense.proto" GrpcServices="Server" Link="Protos\expense.proto" />
+	</ItemGroup>
 	
   <ItemGroup>
     <ProjectReference Include="..\BandBaaajaVivaah.Data\BandBaaajaVivaah.Data.csproj" />

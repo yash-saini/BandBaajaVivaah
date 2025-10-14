@@ -19,6 +19,7 @@ namespace BandBaajaVivaah.WPF
             var navigationService = new NavigationService();
             var themeService = new ThemeService();
             var guestUpdateService = new GuestUpdateService("https://localhost:7159");
+            var expenseUpdateService = new ExpenseUpdateService("https://localhost:7159");
 
             // This loop will continue until the user closes the app without logging out
             while (true)

@@ -1,7 +1,10 @@
 ﻿using BandBaajaVivaah.Contracts.DTO;
+using BandBaajaVivaah.Grpc;
 using BandBaajaVivaah.WPF.Services;
 using BandBaajaVivaah.WPF.ViewModel.Base;
 using System.Collections.ObjectModel;
+using System.Windows;
+using ExpenseUpdateService = BandBaajaVivaah.WPF.Services.ExpenseUpdateService;
 
 namespace BandBaajaVivaah.WPF.ViewModel
 {
@@ -11,6 +14,8 @@ namespace BandBaajaVivaah.WPF.ViewModel
         private readonly NavigationService _navigationService;
         private readonly int _weddingId;
         public event EventHandler<string> ShowMessageRequested;
+        private readonly ExpenseUpdateService _expenseUpdateService;
+        private bool _isSubscribed = false;
         public event EventHandler<(string Message, string Title, Action<bool> Callback)> ShowConfirmationRequested;
 
         private ObservableCollection<ExpenseDto> _expenses;
@@ -63,12 +68,95 @@ namespace BandBaajaVivaah.WPF.ViewModel
             }
         }
 
-        public ExpensesViewModel(ApiClientService apiClient, NavigationService navigationService, int weddingId)
+        public ExpensesViewModel(ApiClientService apiClient, NavigationService navigationService, int weddingId, ExpenseUpdateService expenseUpdateService = null)
         {
             _apiClient = apiClient;
             _navigationService = navigationService;
             _weddingId = weddingId;
+            _expenseUpdateService = expenseUpdateService;
+
+            if (_expenseUpdateService != null)
+            {
+                SubscribeToExpenseUpdates();
+            }
+
             LoadDataAsync();
+        }
+
+        private async void SubscribeToExpenseUpdates()
+        {
+            if (_isSubscribed)
+                return;
+
+            try
+            {
+                _expenseUpdateService.OnExpenseUpdate += OnExpenseUpdateReceived;
+                await _expenseUpdateService.SubscribeToWeddingUpdates(_weddingId);
+                _isSubscribed = true;
+            }
+            catch (Exception ex)
+            {
+                ShowMessageRequested?.Invoke(this, $"Failed to subscribe to real-time updates: {ex.Message}");
+            }
+        }
+
+        private void OnExpenseUpdateReceived(object sender, ExpenseUpdateEvent e)
+        {
+            // Use dispatcher to ensure UI updates happen on the UI thread
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                var expenseDto = new ExpenseDto
+                {
+                    ExpenseID = e.Expense.ExpenseId,
+                    Description = e.Expense.Description,
+                    Amount = (decimal)e.Expense.Amount,
+                    Category = e.Expense.Category,
+                };
+
+                switch (e.Type)
+                {
+                    case ExpenseUpdateEvent.Types.UpdateType.Created:
+                        HandleExpenseCreated(expenseDto);
+                        break;
+                    case ExpenseUpdateEvent.Types.UpdateType.Updated:
+                        HandleExpenseUpdated(expenseDto);
+                        break;
+                    case ExpenseUpdateEvent.Types.UpdateType.Deleted:
+                        HandleExpenseDeleted(expenseDto);
+                        break;
+                }
+            });
+        }
+
+        private void HandleExpenseCreated(ExpenseDto expense)
+        {
+            if (AllItems.Any(g => g.ExpenseID == expense.ExpenseID))
+                return;
+
+            AllItems.Add(expense);
+            UpdateDisplayedItems();
+            ShowMessageRequested?.Invoke(this, $"New expense added: {expense.Amount}");
+        }
+
+        private void HandleExpenseUpdated(ExpenseDto expense)
+        {
+            var existing = AllItems.FirstOrDefault(g => g.ExpenseID == expense.ExpenseID);
+            if (existing != null)
+            {
+                var index = AllItems.IndexOf(existing);
+                AllItems[index] = expense;
+                UpdateDisplayedItems();
+            }
+        }
+
+        private void HandleExpenseDeleted(ExpenseDto expense)
+        {
+            var existing = AllItems.FirstOrDefault(g => g.ExpenseID == expense.ExpenseID);
+            if (existing != null)
+            {
+                AllItems.Remove(existing);
+                UpdateDisplayedItems();
+            }
         }
 
         public void GoBack()
@@ -132,6 +220,16 @@ namespace BandBaajaVivaah.WPF.ViewModel
                      }
                  }
             ));
+        }
+
+        public void Dispose()
+        {
+            if (_expenseUpdateService != null && _isSubscribed)
+            {
+                _expenseUpdateService.OnExpenseUpdate -= OnExpenseUpdateReceived;
+                _expenseUpdateService.Unsubscribe();
+                _isSubscribed = false;
+            }
         }
     }
 }
