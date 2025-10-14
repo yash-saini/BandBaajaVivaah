@@ -31,10 +31,16 @@ namespace BandBaajaVivaah.Services
         public async Task<GuestDto> CreateGuestAsync(CreateGuestDto guestDto, int userId)
         {
             var wedding = await _unitOfWork.Weddings.GetByIdAsync(guestDto.WeddingID);
-            if (wedding == null || wedding.OwnerUserId != userId)
+
+            var user = await _unitOfWork.Users.GetByIdAsync(userId);
+            bool isAdmin = user?.Role?.Equals("Admin", StringComparison.OrdinalIgnoreCase) == true;
+
+            if (wedding == null || (!isAdmin && wedding.OwnerUserId != userId))
             {
                 throw new UnauthorizedAccessException("You are not authorized to add a guest to this wedding.");
             }
+
+            // Call the admin method which has the notification logic
             return await CreateGuestAsAdminAsync(guestDto);
         }
 
@@ -93,10 +99,17 @@ namespace BandBaajaVivaah.Services
             if (guest == null) return false;
 
             var wedding = await _unitOfWork.Weddings.GetByIdAsync(guest.WeddingId);
-            if (wedding == null || wedding.OwnerUserId != userId)
+
+            // Check if user is admin
+            var user = await _unitOfWork.Users.GetByIdAsync(userId);
+            bool isAdmin = user?.Role?.Equals("Admin", StringComparison.OrdinalIgnoreCase) == true;
+
+            if (wedding == null || (!isAdmin && wedding.OwnerUserId != userId))
             {
                 return false; // User does not own the wedding this guest belongs to
             }
+
+            // Call the admin method which has the notification logic
             return await UpdateGuestAsAdminAsync(guestId, updateDto);
         }
 
@@ -109,7 +122,11 @@ namespace BandBaajaVivaah.Services
             guest.LastName = updateDto.LastName;
             guest.Side = updateDto.Side;
             guest.Rsvpstatus = updateDto.RSVPStatus;
+
             await _unitOfWork.CompleteAsync();
+
+            // Notify subscribers about the updated guest
+            Console.WriteLine($"GuestService: Notifying about Updated guest {guest.GuestId} for wedding {guest.WeddingId}");
             await NotifyGuestChange(guest, GuestUpdateEvent.Types.UpdateType.Updated);
 
             return true;
@@ -121,11 +138,18 @@ namespace BandBaajaVivaah.Services
             if (guest == null) return false;
 
             var wedding = await _unitOfWork.Weddings.GetByIdAsync(guest.WeddingId);
-            if (wedding == null || wedding.OwnerUserId != userId)
+
+            // Check if user is admin
+            var user = await _unitOfWork.Users.GetByIdAsync(userId);
+            bool isAdmin = user?.Role?.Equals("Admin", StringComparison.OrdinalIgnoreCase) == true;
+
+            if (wedding == null || (!isAdmin && wedding.OwnerUserId != userId))
             {
                 return false;
             }
-            return await DeleteGuestAsAdminAsync(guestId); // Reuse admin logic after check
+
+            // Call the admin method which has the notification logic
+            return await DeleteGuestAsAdminAsync(guestId);
         }
 
         public async Task<bool> DeleteGuestAsAdminAsync(int guestId)
@@ -141,6 +165,7 @@ namespace BandBaajaVivaah.Services
             await _unitOfWork.CompleteAsync();
 
             // Notify subscribers about the deleted guest
+            Console.WriteLine($"GuestService: Notifying about Deleted guest {guestId} for wedding {weddingId}");
             await GuestUpdateGrpcService.NotifyGuestChange(
                 weddingId,
                 GuestUpdateEvent.Types.UpdateType.Deleted,

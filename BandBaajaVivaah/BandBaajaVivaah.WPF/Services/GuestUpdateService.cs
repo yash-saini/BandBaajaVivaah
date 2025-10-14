@@ -24,21 +24,27 @@ namespace BandBaajaVivaah.WPF.Services
 
         public async Task SubscribeToWeddingUpdates(int weddingId)
         {
-            var request = new GuestUpdateSubscriptionRequest { WeddingId = weddingId };
-
             try
             {
+                var request = new GuestUpdateSubscriptionRequest { WeddingId = weddingId };
                 using var call = _client.SubscribeToGuestUpdates(request);
+
+                Console.WriteLine($"GuestUpdateService: Subscribed to updates for wedding {weddingId}");
 
                 while (await call.ResponseStream.MoveNext(_cancellationTokenSource.Token))
                 {
                     var update = call.ResponseStream.Current;
                     OnGuestUpdate?.Invoke(this, update);
+                    Console.WriteLine($"GuestUpdateService: Received update for wedding {weddingId}, guest {update.Guest.GuestId}, type {update.Type}");
                 }
             }
-            catch (Exception ex) when (ex is OperationCanceledException || ex is RpcException)
+            catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled)
             {
-                Console.WriteLine($"Subscription ended: {ex.Message}");
+                Console.WriteLine($"GuestUpdateService: Subscription cancelled for wedding {weddingId}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"GuestUpdateService: Error in subscription for wedding {weddingId}: {ex.Message}");
             }
         }
 
@@ -50,9 +56,15 @@ namespace BandBaajaVivaah.WPF.Services
 
         public async ValueTask DisposeAsync()
         {
-            Unsubscribe();
+            //Unsubscribe();
+            _cancellationTokenSource.Cancel();
             _cancellationTokenSource.Dispose();
-            await _channel.ShutdownAsync();
+
+            if (_channel != null)
+            {
+                await _channel.ShutdownAsync();
+                _channel.Dispose();
+            }
         }
     }
 }

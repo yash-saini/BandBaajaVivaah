@@ -85,6 +85,7 @@ namespace BandBaajaVivaah.WPF.ViewModel
             _navigationService = navigationService;
             _targetUser = targetUser;
             _isAdminMode = true;
+            _guestUpdateService = new GuestUpdateService("https://localhost:7159");
 
             ManageGuestsCommand = new RelayCommand(NavigateToGuests);
             ManageTasksCommand = new RelayCommand(NavigateToTasks);
