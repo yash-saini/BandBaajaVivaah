@@ -24,6 +24,10 @@
 	<ItemGroup>
 		<Protobuf Include="..\BandBaajaVivaah.WebAPI\Protos\guest.proto" GrpcServices="Client" Link="Protos\guest.proto" />
 	</ItemGroup>
+	
+	<ItemGroup>
+		<Protobuf Include="..\BandBaajaVivaah.WebAPI\Protos\expense.proto" GrpcServices="Client" Link="Protos\expense.proto" />
+	</ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="3.32.1" />
