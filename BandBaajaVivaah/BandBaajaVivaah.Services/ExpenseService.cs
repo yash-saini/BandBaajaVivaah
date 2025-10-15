@@ -204,7 +204,8 @@ namespace BandBaajaVivaah.Services
                 Description = expense.Description ?? string.Empty,
                 Amount = (double)expense.Amount,
                 Category = expense.Category ?? string.Empty,
-                WeddingId = expense.WeddingId
+                WeddingId = expense.WeddingId,
+                PaymentDate = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(expense.PaymentDate.ToUniversalTime())
             };
         }
     }

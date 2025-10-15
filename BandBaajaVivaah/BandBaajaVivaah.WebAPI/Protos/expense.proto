@@ -1,5 +1,5 @@
 ﻿syntax = "proto3";
-
+import "google/protobuf/timestamp.proto";
 option csharp_namespace = "BandBaajaVivaah.Grpc";
 
 package expenseupdate;
@@ -29,4 +29,5 @@ message ExpenseDetails {
   double amount = 3;
   string category = 4;
   int32 wedding_id = 5;
+  google.protobuf.Timestamp payment_date = 6;
 }
