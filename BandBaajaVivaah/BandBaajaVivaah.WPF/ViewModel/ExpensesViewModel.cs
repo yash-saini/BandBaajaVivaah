@@ -111,6 +111,7 @@ namespace BandBaajaVivaah.WPF.ViewModel
                     Description = e.Expense.Description,
                     Amount = (decimal)e.Expense.Amount,
                     Category = e.Expense.Category,
+                    PaymentDate = e.Expense.PaymentDate.ToDateTime(),
                 };
 
                 switch (e.Type)
