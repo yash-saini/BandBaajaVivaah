@@ -1,19 +1,21 @@
 ﻿using BandBaaajaVivaah.Data.Models;
 using BandBaaajaVivaah.Data.Repositories;
 using BandBaajaVivaah.Contracts.DTOs;
+using BandBaajaVivaah.Grpc;
+using BandBaajaVivaah.Services.GrpcServices;
+using Google.Protobuf.WellKnownTypes;
 
 namespace BandBaajaVivaah.Services
 {
     public interface IWeddingService
     {
-        Task<WeddingDto?> GetWeddingByIdAsync(int weddingId, int? userId = null);
-        Task<IEnumerable<WeddingDto>> GetWeddingsForUserAsync(int userId);
-        Task<WeddingDto> CreateWeddingAsync(CreateWeddingDto weddingDto, int ownerUserId);
-
+        Task<IEnumerable<WeddingDto>> GetWeddingsAsync(int userId);
+        Task<WeddingDto> CreateWeddingAsync(CreateWeddingDto weddingDto, int userId);
         Task<bool> DeleteWeddingAsync(int weddingId, int? ownerUserId);
         Task<bool> UpdateWeddingAsync(int weddingId, CreateWeddingDto weddingDto, int? ownerUserId);
-
+        Task<WeddingDto?> GetWeddingByIdAsync(int weddingId, int? ownerUserId);
         Task<IEnumerable<WeddingDto>> GetAllWeddingsAsync();
+        Task<IEnumerable<WeddingDto>> GetWeddingsForUserAsync(int userId);
     }
 
     public class WeddingService : IWeddingService
@@ -25,18 +27,79 @@ namespace BandBaajaVivaah.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<WeddingDto> CreateWeddingAsync(CreateWeddingDto weddingDto, int ownerUserId)
+        public async Task<WeddingDto> CreateWeddingAsync(CreateWeddingDto weddingDto, int userId)
         {
             var wedding = new Wedding
             {
                 WeddingName = weddingDto.WeddingName,
                 WeddingDate = weddingDto.WeddingDate,
                 TotalBudget = weddingDto.TotalBudget,
-                OwnerUserId = ownerUserId
+                OwnerUserId = userId
             };
 
             await _unitOfWork.Weddings.AddAsync(wedding);
             await _unitOfWork.CompleteAsync();
+
+            var result = new WeddingDto
+            {
+                WeddingID = wedding.WeddingId,
+                WeddingName = wedding.WeddingName,
+                WeddingDate = wedding.WeddingDate,
+                TotalBudget = wedding.TotalBudget,
+                OwnerUserId = wedding.OwnerUserId
+            };
+
+            // Notify subscribers about the new wedding
+            Console.WriteLine($"WeddingService: Notifying about Created wedding {wedding.WeddingId} for user {userId}");
+            await NotifyWeddingChange(wedding, WeddingUpdateEvent.Types.UpdateType.Created);
+
+            return result;
+        }
+
+        public async Task<bool> DeleteWeddingAsync(int weddingId, int? ownerUserId)
+        {
+            var wedding = await _unitOfWork.Weddings.GetByIdAsync(weddingId);
+            if (wedding == null)
+            {
+                return false;
+            }
+
+            // If ownerUserId is provided (not admin), verify ownership
+            if (ownerUserId.HasValue && wedding.OwnerUserId != ownerUserId.Value)
+            {
+                return false;
+            }
+
+            // Store user ID and wedding details before deletion for notification
+            var userId = wedding.OwnerUserId;
+            var weddingDetails = CreateWeddingDetails(wedding);
+
+            await _unitOfWork.Weddings.DeleteAsync(weddingId);
+            await _unitOfWork.CompleteAsync();
+
+            // Notify subscribers about the deleted wedding
+            Console.WriteLine($"WeddingService: Notifying about Deleted wedding {weddingId} for user {userId}");
+            await WeddingUpdateGrpcService.NotifyWeddingChange(
+                userId,
+                WeddingUpdateEvent.Types.UpdateType.Deleted,
+                weddingDetails);
+
+            return true;
+        }
+
+        public async Task<WeddingDto?> GetWeddingByIdAsync(int weddingId, int? ownerUserId)
+        {
+            var wedding = await _unitOfWork.Weddings.GetByIdAsync(weddingId);
+            if (wedding == null)
+            {
+                return null;
+            }
+
+            // If ownerUserId is provided (not admin), verify ownership
+            if (ownerUserId.HasValue && wedding.OwnerUserId != ownerUserId.Value)
+            {
+                return null;
+            }
 
             return new WeddingDto
             {
@@ -48,23 +111,56 @@ namespace BandBaajaVivaah.Services
             };
         }
 
-        public async Task<WeddingDto?> GetWeddingByIdAsync(int weddingId, int? userId)
+        public async Task<IEnumerable<WeddingDto>> GetWeddingsAsync(int userId)
+        {
+            var weddings = await _unitOfWork.Weddings.GetAllForUserAsync(userId);
+            return weddings.Select(w => new WeddingDto
+            {
+                WeddingID = w.WeddingId,
+                WeddingName = w.WeddingName,
+                WeddingDate = w.WeddingDate,
+                TotalBudget = w.TotalBudget,
+                OwnerUserId = w.OwnerUserId
+            });
+        }
+
+        public async Task<bool> UpdateWeddingAsync(int weddingId, CreateWeddingDto weddingDto, int? ownerUserId)
         {
             var wedding = await _unitOfWork.Weddings.GetByIdAsync(weddingId);
-
-            if (wedding == null || wedding.OwnerUserId != userId)
+            if (wedding == null)
             {
-                return null; // Not found or user does not have access
+                return false;
             }
 
-            return new WeddingDto
+            // If ownerUserId is provided (not admin), verify ownership
+            if (ownerUserId.HasValue && wedding.OwnerUserId != ownerUserId.Value)
             {
-                WeddingID = wedding.WeddingId,
-                WeddingName = wedding.WeddingName,
-                WeddingDate = wedding.WeddingDate,
-                TotalBudget = wedding.TotalBudget,
-                OwnerUserId = wedding.OwnerUserId
-            };
+                return false;
+            }
+
+            wedding.WeddingName = weddingDto.WeddingName;
+            wedding.WeddingDate = weddingDto.WeddingDate;
+            wedding.TotalBudget = weddingDto.TotalBudget;
+
+            await _unitOfWork.CompleteAsync();
+
+            Console.WriteLine($"WeddingService: Notifying about Updated wedding {wedding.WeddingId} for user {wedding.OwnerUserId}");
+            await NotifyWeddingChange(wedding, WeddingUpdateEvent.Types.UpdateType.Updated);
+
+            return true;
+        }
+
+        public async Task<IEnumerable<WeddingDto>> GetAllWeddingsAsync()
+        {
+            var weddings = await _unitOfWork.Weddings.GetAllAsync();
+            return weddings.Select(w => new WeddingDto
+            {
+                WeddingID = w.WeddingId,
+                WeddingName = w.WeddingName,
+                WeddingDate = w.WeddingDate,
+                TotalBudget = w.TotalBudget,
+                OwnerUserId = w.OwnerUserId
+            });
         }
 
         public async Task<IEnumerable<WeddingDto>> GetWeddingsForUserAsync(int userId)
@@ -80,51 +176,26 @@ namespace BandBaajaVivaah.Services
             });
         }
 
-        public async Task<bool> DeleteWeddingAsync(int weddingId, int? ownerUserId = null)
+        private async System.Threading.Tasks.Task NotifyWeddingChange(Wedding wedding, WeddingUpdateEvent.Types.UpdateType updateType)
         {
-            var wedding = await _unitOfWork.Weddings.GetByIdAsync(weddingId);
+            var weddingDetails = CreateWeddingDetails(wedding);
 
-            // If ownerUserId is null (admin request), skip owner check
-            if (wedding == null || (ownerUserId.HasValue && wedding.OwnerUserId != ownerUserId.Value))
-            {
-                return false; // Not found or user does not have access
-            }
-
-            await _unitOfWork.Weddings.DeleteAsync(weddingId);
-            await _unitOfWork.CompleteAsync();
-            return true;
+            await WeddingUpdateGrpcService.NotifyWeddingChange(
+                wedding.OwnerUserId,
+                updateType,
+                weddingDetails);
         }
 
-        public async Task<bool> UpdateWeddingAsync(int weddingId, CreateWeddingDto weddingDto, int? ownerUserId)
+        private WeddingDetails CreateWeddingDetails(Wedding wedding)
         {
-            var wedding = await _unitOfWork.Weddings.GetByIdAsync(weddingId);
-            // If wedding doesn't exist, return false
-            if (wedding == null)
+            return new WeddingDetails
             {
-                return false;
-            }
-            if (ownerUserId.HasValue && wedding.OwnerUserId != ownerUserId.Value)
-            {
-                return false;
-            }
-            wedding.WeddingName = weddingDto.WeddingName;
-            wedding.WeddingDate = weddingDto.WeddingDate;
-            wedding.TotalBudget = weddingDto.TotalBudget;
-            await _unitOfWork.CompleteAsync();
-            return true;
-        }
-
-        public async Task<IEnumerable<WeddingDto>> GetAllWeddingsAsync()
-        {
-            var weddings = await _unitOfWork.Weddings.GetAllAsync();
-            return weddings.Select(w => new WeddingDto
-            {
-                WeddingID = w.WeddingId,
-                WeddingName = w.WeddingName,
-                WeddingDate = w.WeddingDate,
-                TotalBudget = w.TotalBudget,
-                OwnerUserId = w.OwnerUserId
-            });
+                WeddingId = wedding.WeddingId,
+                WeddingName = wedding.WeddingName ?? string.Empty,
+                WeddingDate = Timestamp.FromDateTime(wedding.WeddingDate.ToUniversalTime()),
+                TotalBudget = (double)wedding.TotalBudget,
+                OwnerUserId = wedding.OwnerUserId
+            };
         }
     }
 }
