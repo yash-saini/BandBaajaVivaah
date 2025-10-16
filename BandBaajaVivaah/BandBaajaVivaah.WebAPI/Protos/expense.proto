@@ -1,0 +1,33 @@
+﻿syntax = "proto3";
+import "google/protobuf/timestamp.proto";
+option csharp_namespace = "BandBaajaVivaah.Grpc";
+
+package expenseupdate;
+
+service ExpenseUpdateService {
+  rpc SubscribeToExpenseUpdates(ExpenseUpdateSubscriptionRequest) returns (stream ExpenseUpdateEvent);
+}
+
+message ExpenseUpdateSubscriptionRequest {
+  int32 wedding_id = 1;
+}
+
+message ExpenseUpdateEvent {
+  enum UpdateType {
+    CREATED = 0;
+    UPDATED = 1;
+    DELETED = 2;
+  }
+  
+  UpdateType type = 1;
+  ExpenseDetails expense = 2;
+}
+
+message ExpenseDetails {
+  int32 expense_id = 1;
+  string description = 2;
+  double amount = 3;
+  string category = 4;
+  int32 wedding_id = 5;
+  google.protobuf.Timestamp payment_date = 6;
+}

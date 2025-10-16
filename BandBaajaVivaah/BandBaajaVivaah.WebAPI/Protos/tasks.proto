@@ -1,0 +1,33 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "BandBaajaVivaah.Grpc";
+import "google/protobuf/timestamp.proto";
+package taskupdate;
+
+service TaskUpdateService {
+  rpc SubscribeToTaskUpdates(TaskUpdateSubscriptionRequest) returns (stream TaskUpdateEvent);
+}
+
+message TaskUpdateSubscriptionRequest {
+  int32 wedding_id = 1;
+}
+
+message TaskUpdateEvent {
+  enum UpdateType {
+    CREATED = 0;
+    UPDATED = 1;
+    DELETED = 2;
+  }
+  
+  UpdateType type = 1;
+  TaskDetails task = 2;
+}
+
+message TaskDetails {
+  int32 task_id = 1;
+  string title = 2;
+  string description = 3;
+  string status = 4;
+  int32 wedding_id = 5;
+  google.protobuf.Timestamp due_date = 6;
+}

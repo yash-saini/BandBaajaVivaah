@@ -92,4 +92,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapGrpcService<BandBaajaVivaah.Services.GrpcServices.GuestUpdateGrpcService>();
+app.MapGrpcService<BandBaajaVivaah.Services.GrpcServices.ExpenseUpdateGrpcService>();
+app.MapGrpcService<BandBaajaVivaah.Services.GrpcServices.TaskUpdateGrpcService>();
+app.MapGrpcService<BandBaajaVivaah.Services.GrpcServices.WeddingUpdateGrpcService>();
 app.Run();

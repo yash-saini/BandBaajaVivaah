@@ -1,6 +1,8 @@
 ﻿using BandBaaajaVivaah.Data.Models;
 using BandBaaajaVivaah.Data.Repositories;
 using BandBaajaVivaah.Contracts.DTO;
+using BandBaajaVivaah.Grpc;
+using BandBaajaVivaah.Services.GrpcServices;
 
 namespace BandBaajaVivaah.Services
 {
@@ -28,12 +30,19 @@ namespace BandBaajaVivaah.Services
         public async Task<ExpenseDto> CreateExpenseAsync(CreateExpenseDto expenseDto, int userId)
         {
             var wedding = await _unitOfWork.Weddings.GetByIdAsync(expenseDto.WeddingID);
-            if (wedding == null || wedding.OwnerUserId != userId)
+
+            // Check if user is admin
+            var user = await _unitOfWork.Users.GetByIdAsync(userId);
+            bool isAdmin = user?.Role?.Equals("Admin", StringComparison.OrdinalIgnoreCase) == true;
+
+            if (wedding == null || (!isAdmin && wedding.OwnerUserId != userId))
             {
                 throw new UnauthorizedAccessException("You are not authorized to add an expense to this wedding.");
             }
+
             return await CreateExpensesAsAdminAsync(expenseDto);
         }
+
 
         public async Task<ExpenseDto> CreateExpensesAsAdminAsync(CreateExpenseDto expenseDto)
         {
@@ -45,9 +54,11 @@ namespace BandBaajaVivaah.Services
                 PaymentDate = expenseDto.PaymentDate,
                 WeddingId = expenseDto.WeddingID,
             };
+
             await _unitOfWork.Expenses.AddAsync(expense);
             await _unitOfWork.CompleteAsync();
-            return new ExpenseDto
+
+            var result = new ExpenseDto
             {
                 ExpenseID = expense.ExpenseId,
                 Description = expense.Description,
@@ -55,6 +66,12 @@ namespace BandBaajaVivaah.Services
                 Category = expense.Category,
                 PaymentDate = expense.PaymentDate
             };
+
+            // Notify subscribers about the new expense
+            Console.WriteLine($"ExpenseService: Notifying about Created expense {expense.ExpenseId} for wedding {expense.WeddingId}");
+            await NotifyExpenseChange(expense, ExpenseUpdateEvent.Types.UpdateType.Created);
+
+            return result;
         }
 
         public async Task<IEnumerable<ExpenseDto>> GetExpensesByWeddingIdAsync(int weddingId, int userId)
@@ -87,11 +104,18 @@ namespace BandBaajaVivaah.Services
             {
                 return false;
             }
+
             var wedding = await _unitOfWork.Weddings.GetByIdAsync(expense.WeddingId);
-            if (wedding == null || wedding.OwnerUserId != userId)
+
+            // Check if user is admin
+            var user = await _unitOfWork.Users.GetByIdAsync(userId);
+            bool isAdmin = user?.Role?.Equals("Admin", StringComparison.OrdinalIgnoreCase) == true;
+
+            if (wedding == null || (!isAdmin && wedding.OwnerUserId != userId))
             {
                 throw new UnauthorizedAccessException("You are not authorized to update this expense.");
             }
+
             return await UpdateExpensesAsAdminAsync(expenseId, expenseDto);
         }
 
@@ -102,11 +126,18 @@ namespace BandBaajaVivaah.Services
             {
                 return false;
             }
+
             expense.Description = expenseDto.Description;
             expense.Amount = expenseDto.Amount;
             expense.Category = expenseDto.Category;
             expense.PaymentDate = expenseDto.PaymentDate;
+
             await _unitOfWork.CompleteAsync();
+
+            // Notify subscribers about the updated expense
+            Console.WriteLine($"ExpenseService: Notifying about Updated expense {expense.ExpenseId} for wedding {expense.WeddingId}");
+            await NotifyExpenseChange(expense, ExpenseUpdateEvent.Types.UpdateType.Updated);
+
             return true;
         }
 
@@ -117,11 +148,18 @@ namespace BandBaajaVivaah.Services
             {
                 return false;
             }
+
             var wedding = await _unitOfWork.Weddings.GetByIdAsync(expense.WeddingId);
-            if (wedding == null || wedding.OwnerUserId != userId)
+
+            // Check if user is admin
+            var user = await _unitOfWork.Users.GetByIdAsync(userId);
+            bool isAdmin = user?.Role?.Equals("Admin", StringComparison.OrdinalIgnoreCase) == true;
+
+            if (wedding == null || (!isAdmin && wedding.OwnerUserId != userId))
             {
                 return false;
             }
+
             return await DeleteExpensesAsAdminAsync(expenseId);
         }
 
@@ -129,9 +167,46 @@ namespace BandBaajaVivaah.Services
         {
             var expense = await _unitOfWork.Expenses.GetByIdAsync(expenseId);
             if (expense == null) return false;
+
+            // Store wedding ID and expense details before deletion for notification
+            var weddingId = expense.WeddingId;
+            var expenseDetails = CreateExpenseDetails(expense);
+
             await _unitOfWork.Expenses.DeleteAsync(expenseId);
             await _unitOfWork.CompleteAsync();
+
+            // Notify subscribers about the deleted expense
+            Console.WriteLine($"ExpenseService: Notifying about Deleted expense {expenseId} for wedding {weddingId}");
+            await ExpenseUpdateGrpcService.NotifyExpenseChange(
+                weddingId,
+                ExpenseUpdateEvent.Types.UpdateType.Deleted,
+                expenseDetails);
+
             return true;
+        }
+
+        private async System.Threading.Tasks.Task NotifyExpenseChange(Expense expense, ExpenseUpdateEvent.Types.UpdateType updateType)
+        {
+            var expenseDetails = CreateExpenseDetails(expense);
+
+            await ExpenseUpdateGrpcService.NotifyExpenseChange(
+                expense.WeddingId,
+                updateType,
+                expenseDetails);
+        }
+
+        // Helper to create gRPC ExpenseDetails object from Expense model
+        private ExpenseDetails CreateExpenseDetails(Expense expense)
+        {
+            return new ExpenseDetails
+            {
+                ExpenseId = expense.ExpenseId,
+                Description = expense.Description ?? string.Empty,
+                Amount = (double)expense.Amount,
+                Category = expense.Category ?? string.Empty,
+                WeddingId = expense.WeddingId,
+                PaymentDate = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(expense.PaymentDate.ToUniversalTime())
+            };
         }
     }
 }

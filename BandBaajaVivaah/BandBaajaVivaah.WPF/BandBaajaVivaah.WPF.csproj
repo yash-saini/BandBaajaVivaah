@@ -23,6 +23,9 @@
 	
 	<ItemGroup>
 		<Protobuf Include="..\BandBaajaVivaah.WebAPI\Protos\guest.proto" GrpcServices="Client" Link="Protos\guest.proto" />
+		<Protobuf Include="..\BandBaajaVivaah.WebAPI\Protos\expense.proto" GrpcServices="Client" Link="Protos\expense.proto" />
+		<Protobuf Include="..\BandBaajaVivaah.WebAPI\Protos\tasks.proto" GrpcServices="Client" Link="Protos\tasks.proto" />
+		<Protobuf Include="..\BandBaajaVivaah.WebAPI\Protos\wedding.proto" GrpcServices="Client" Link="Protos\wedding.proto" />
 	</ItemGroup>
 
   <ItemGroup>

@@ -15,20 +15,31 @@ namespace BandBaajaVivaah.WPF.Views.Pages
         ExpensesViewModel? ViewModel => DataContext as ExpensesViewModel;
         private readonly ApiClientService _apiClient;
         private readonly NavigationService _navigationService;
+        private readonly ExpenseUpdateService _expenseUpdateService;
         private readonly int _weddingId;
 
-        public ExpensesView(ApiClientService apiClient, NavigationService navigationService, int weddingId)
+        public ExpensesView(ApiClientService apiClient, NavigationService navigationService, int weddingId, ExpenseUpdateService expenseUpdateService)
         {
             InitializeComponent();
             _apiClient = apiClient;
             _navigationService = navigationService;
             _weddingId = weddingId;
-            var viewModel = new ExpensesViewModel(apiClient, navigationService, weddingId);
+            _expenseUpdateService = expenseUpdateService;
+            var viewModel = new ExpensesViewModel(apiClient, navigationService, weddingId, _expenseUpdateService);
 
             viewModel.ShowMessageRequested += ViewModel_ShowMessageRequested;
             viewModel.ShowConfirmationRequested += ViewModel_ShowConfirmationRequested;
 
             DataContext = viewModel;
+            Unloaded += ExpensesView_Unloaded;
+        }
+
+        private void ExpensesView_Unloaded(object sender, RoutedEventArgs e)
+        {
+            if (ViewModel is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
         }
 
         private void ViewModel_ShowMessageRequested(object? sender, string message)
