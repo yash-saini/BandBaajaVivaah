@@ -1,5 +1,8 @@
 ﻿using BandBaaajaVivaah.Data.Repositories;
 using BandBaajaVivaah.Contracts.DTOs;
+using BandBaajaVivaah.Grpc;
+using BandBaajaVivaah.Services.GrpcServices;
+using Google.Protobuf.WellKnownTypes;
 
 namespace BandBaajaVivaah.Services
 {
@@ -28,7 +31,11 @@ namespace BandBaajaVivaah.Services
         {
             // Security Check: Ensure the user owns the wedding they're adding a task to
             var wedding = await _unitOfWork.Weddings.GetByIdAsync(taskDto.WeddingID);
-            if (wedding == null || wedding.OwnerUserId != userId)
+
+            var user = await _unitOfWork.Users.GetByIdAsync(userId);
+            bool isAdmin = user?.Role?.Equals("Admin", StringComparison.OrdinalIgnoreCase) == true;
+
+            if (wedding == null || (!isAdmin && wedding.OwnerUserId != userId))
             {
                 throw new UnauthorizedAccessException("You are not authorized to add a task to this wedding.");
             }
@@ -50,7 +57,7 @@ namespace BandBaajaVivaah.Services
             await _unitOfWork.Tasks.AddAsync(task);
             await _unitOfWork.CompleteAsync();
 
-            return new TaskDto
+           var result = new TaskDto
             {
                 TaskID = task.TaskId,
                 Title = task.Title,
@@ -58,6 +65,9 @@ namespace BandBaajaVivaah.Services
                 Description = task.Description,
                 DueDate = task.DueDate,
             };
+
+            await NotifyTaskChange(task, TaskUpdateEvent.Types.UpdateType.Created);
+            return result;
         }
 
         public async Task<IEnumerable<TaskDto>> GetTasksByWeddingIdAsync(int weddingId, int userId)
@@ -68,7 +78,7 @@ namespace BandBaajaVivaah.Services
 
             if (wedding == null || (!isAdmin && wedding.OwnerUserId != userId))
             {
-                throw new UnauthorizedAccessException("You are not authorized to view guests for this wedding.");
+                throw new UnauthorizedAccessException("You are not authorized to view tasks for this wedding.");
             }
 
             var tasks = await _unitOfWork.Tasks.FindAllAsync(t => t.WeddingId == weddingId); // Requires custom repository method
@@ -90,9 +100,12 @@ namespace BandBaajaVivaah.Services
                 return false;
             }
             var wedding = await _unitOfWork.Weddings.GetByIdAsync(task.WeddingId);
-            if (wedding == null || wedding.OwnerUserId != userId)
+            var user = await _unitOfWork.Users.GetByIdAsync(userId);
+            bool isAdmin = user?.Role?.Equals("Admin", StringComparison.OrdinalIgnoreCase) == true;
+
+            if (wedding == null || (!isAdmin && wedding.OwnerUserId != userId))
             {
-                return false;
+                return false; // User does not own the wedding this task belongs to
             }
             return await UpdateTasksAsAdminAsync(taskId, taskDto);
         }
@@ -109,6 +122,7 @@ namespace BandBaajaVivaah.Services
             task.DueDate = taskDto.DueDate;
             task.Status = taskDto.Status;
             await _unitOfWork.CompleteAsync();
+            await NotifyTaskChange(task, TaskUpdateEvent.Types.UpdateType.Updated);
             return true;
         }
 
@@ -120,7 +134,10 @@ namespace BandBaajaVivaah.Services
                 return false;
             }
             var wedding = await _unitOfWork.Weddings.GetByIdAsync(task.WeddingId);
-            if (wedding == null || wedding.OwnerUserId != userId)
+            var user = await _unitOfWork.Users.GetByIdAsync(userId);
+            bool isAdmin = user?.Role?.Equals("Admin", StringComparison.OrdinalIgnoreCase) == true;
+
+            if (wedding == null || (!isAdmin && wedding.OwnerUserId != userId))
             {
                 return false;
             }
@@ -130,13 +147,45 @@ namespace BandBaajaVivaah.Services
         public async Task<bool> DeleteTasksAsAdminAsync(int taskId)
         {
             var task = await _unitOfWork.Tasks.GetByIdAsync(taskId);
+
             if (task == null)
             {
                 return false;
             }
+            var weddingId = task.WeddingId;
+            var taskDetails = CreateTaskDetails(task);
             await _unitOfWork.Tasks.DeleteAsync(taskId);
             await _unitOfWork.CompleteAsync();
+
+            await TaskUpdateGrpcService.NotifyTaskChange(
+                weddingId,
+                TaskUpdateEvent.Types.UpdateType.Deleted,
+                taskDetails);
             return true;
+        }
+
+        private async System.Threading.Tasks.Task NotifyTaskChange(BandBaaajaVivaah.Data.Models.Task task, TaskUpdateEvent.Types.UpdateType updateType)
+        {
+            var taskDetails = CreateTaskDetails(task);
+            await TaskUpdateGrpcService.NotifyTaskChange(
+                task.WeddingId,
+                updateType,
+                taskDetails);
+        }
+
+        private TaskDetails CreateTaskDetails(BandBaaajaVivaah.Data.Models.Task task)
+        {
+            return new TaskDetails
+            {
+                TaskId = task.TaskId,
+                Title = task.Title,
+                Description = task.Description ?? string.Empty,
+                Status = task.Status ?? string.Empty,
+                DueDate = task.DueDate.HasValue
+                        ? Timestamp.FromDateTime(task.DueDate.Value.ToUniversalTime())
+                        : null,
+                WeddingId=task.WeddingId    
+            };
         }
     }
 }

@@ -15,18 +15,29 @@ namespace BandBaajaVivaah.WPF.Views.Pages
         TasksViewModel? ViewModel => DataContext as TasksViewModel;
         private readonly ApiClientService _apiClient;
         private readonly NavigationService _navigationService;
+        private readonly TaskUpdateService _taskUpdateService;
         private readonly int _weddingId;
 
-        public TasksView(ApiClientService apiClient, NavigationService navigationService, int weddingId)
+        public TasksView(ApiClientService apiClient, NavigationService navigationService, int weddingId, TaskUpdateService taskUpdateService)
         {
             InitializeComponent();
             _apiClient = apiClient;
             _weddingId = weddingId;
             _navigationService = navigationService;
-            var viewModel = new TasksViewModel(_apiClient, _navigationService, weddingId);
+            _taskUpdateService = taskUpdateService;
+            var viewModel = new TasksViewModel(_apiClient, _navigationService, weddingId, _taskUpdateService);
             viewModel.ShowMessageRequested += ViewModel_ShowMessageRequested;
             viewModel.ShowConfirmationRequested += ViewModel_ShowConfirmationRequested;
             DataContext = viewModel;
+            Unloaded += TasksView_Unloaded;
+        }
+
+        private void TasksView_Unloaded(object sender, RoutedEventArgs e)
+        {
+            if (ViewModel is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
         }
 
         private void ViewModel_ShowMessageRequested(object? sender, string message)

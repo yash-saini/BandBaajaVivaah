@@ -23,10 +23,8 @@
 	
 	<ItemGroup>
 		<Protobuf Include="..\BandBaajaVivaah.WebAPI\Protos\guest.proto" GrpcServices="Client" Link="Protos\guest.proto" />
-	</ItemGroup>
-	
-	<ItemGroup>
 		<Protobuf Include="..\BandBaajaVivaah.WebAPI\Protos\expense.proto" GrpcServices="Client" Link="Protos\expense.proto" />
+		<Protobuf Include="..\BandBaajaVivaah.WebAPI\Protos\tasks.proto" GrpcServices="Client" Link="Protos\tasks.proto" />
 	</ItemGroup>
 
   <ItemGroup>
