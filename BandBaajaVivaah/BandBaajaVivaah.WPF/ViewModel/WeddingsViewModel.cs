@@ -18,6 +18,7 @@ namespace BandBaajaVivaah.WPF.ViewModel
         private readonly bool _isAdminMode;
         private readonly GuestUpdateService _guestUpdateService;
         private readonly ExpenseUpdateService _expenseUpdateService;
+        private readonly TaskUpdateService _taskUpdateService;
 
         public bool IsAdminMode => _isAdminMode;
         public UserDto? TargetUser => _isAdminMode ? _targetUser : null;
@@ -73,6 +74,7 @@ namespace BandBaajaVivaah.WPF.ViewModel
             _navigationService = navigationService;
             _guestUpdateService = new GuestUpdateService("https://localhost:7159");
             _expenseUpdateService = new ExpenseUpdateService("https://localhost:7159");
+            _taskUpdateService = new TaskUpdateService("https://localhost:7159");
 
             ManageGuestsCommand = new RelayCommand(NavigateToGuests);
             ManageTasksCommand = new RelayCommand(NavigateToTasks);
@@ -90,6 +92,7 @@ namespace BandBaajaVivaah.WPF.ViewModel
             _isAdminMode = true;
             _guestUpdateService = new GuestUpdateService("https://localhost:7159");
             _expenseUpdateService = new ExpenseUpdateService("https://localhost:7159");
+            _taskUpdateService = new TaskUpdateService("https://localhost:7159");
 
             ManageGuestsCommand = new RelayCommand(NavigateToGuests);
             ManageTasksCommand = new RelayCommand(NavigateToTasks);
@@ -160,7 +163,7 @@ namespace BandBaajaVivaah.WPF.ViewModel
         {
             if (obj is WeddingDto wedding)
             {
-                var taskPage = new TasksView(_apiClient, _navigationService, wedding.WeddingID);
+                var taskPage = new TasksView(_apiClient, _navigationService, wedding.WeddingID, _taskUpdateService);
                 _navigationService.NavigateTo(taskPage);
             }
         }
