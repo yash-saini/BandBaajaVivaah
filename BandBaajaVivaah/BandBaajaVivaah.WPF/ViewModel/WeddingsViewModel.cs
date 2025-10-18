@@ -64,6 +64,12 @@ namespace BandBaajaVivaah.WPF.ViewModel
             }
         }
 
+        // Regular user constructor (2 parameters) - calls the 3-parameter version
+        public WeddingsViewModel(ApiClientService apiClient, NavigationService navigationService)
+            : this(apiClient, navigationService, GetBaseUrlFromApiClient(apiClient))
+        {
+        }
+
         // Regular user constructor with base URL
         public WeddingsViewModel(ApiClientService apiClient, NavigationService navigationService, string baseApiUrl)
         {

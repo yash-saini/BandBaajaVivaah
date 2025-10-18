@@ -25,7 +25,6 @@ namespace BandBaajaVivaah.WPF.ViewModel.Admin
             DeleteUserCommand = new RelayCommand(async _ => await DeleteSelectedUser(), _ => SelectedItem != null);
             ViewUserWeddingsCommand = new RelayCommand(ViewUserWeddings, param => param is UserDto);
 
-
             LoadDataAsync();
         }
 
