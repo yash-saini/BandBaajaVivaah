@@ -14,12 +14,18 @@ namespace BandBaajaVivaah.WPF
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-
-            var apiClient = new ApiClientService();
+#if DEBUG
+            // For local development, use your localhost address.
+            string baseApiUrl = "https://localhost:7159";
+#else
+            // For PRODUCTION, use your live Azure URL.
+            string baseApiUrl = "https://bandbaaja-api-2025.azurewebsites.net";
+#endif
+            var apiClient = new ApiClientService(baseApiUrl);
             var navigationService = new NavigationService();
             var themeService = new ThemeService();
-            var guestUpdateService = new GuestUpdateService("https://localhost:7159");
-            var expenseUpdateService = new ExpenseUpdateService("https://localhost:7159");
+            var guestUpdateService = new GuestUpdateService(baseApiUrl);
+            var expenseUpdateService = new ExpenseUpdateService(baseApiUrl);
 
             // This loop will continue until the user closes the app without logging out
             while (true)

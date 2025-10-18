@@ -10,12 +10,12 @@ namespace BandBaajaVivaah.WPF.Services
     {
         private readonly HttpClient _httpClient;
 
-        public ApiClientService()
+        public ApiClientService(string baseApiUrl)
         {
             _httpClient = new HttpClient();
             // IMPORTANT: Replace this port with the one your API is running on.
             // You can find this in your API project's launchSettings.json file.
-            _httpClient.BaseAddress = new Uri("https://localhost:7159/");
+            _httpClient.BaseAddress = new Uri(baseApiUrl);
             _httpClient.DefaultRequestHeaders.Accept.Clear();
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }

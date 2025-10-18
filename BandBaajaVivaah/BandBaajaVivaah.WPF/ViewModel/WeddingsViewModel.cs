@@ -64,15 +64,15 @@ namespace BandBaajaVivaah.WPF.ViewModel
             }
         }
 
-        // Regular user constructor
-        public WeddingsViewModel(ApiClientService apiClient, NavigationService navigationService)
+        // Regular user constructor with base URL
+        public WeddingsViewModel(ApiClientService apiClient, NavigationService navigationService, string baseApiUrl)
         {
             _apiClient = apiClient;
             _navigationService = navigationService;
-            _guestUpdateService = new GuestUpdateService("https://localhost:7159");
-            _expenseUpdateService = new ExpenseUpdateService("https://localhost:7159");
-            _taskUpdateService = new TaskUpdateService("https://localhost:7159");
-            _weddingUpdateService = new WeddingUpdateService("https://localhost:7159");
+            _guestUpdateService = new GuestUpdateService(baseApiUrl);
+            _expenseUpdateService = new ExpenseUpdateService(baseApiUrl);
+            _taskUpdateService = new TaskUpdateService(baseApiUrl);
+            _weddingUpdateService = new WeddingUpdateService(baseApiUrl);
 
             ManageGuestsCommand = new RelayCommand(NavigateToGuests);
             ManageTasksCommand = new RelayCommand(NavigateToTasks);
@@ -85,16 +85,22 @@ namespace BandBaajaVivaah.WPF.ViewModel
 
         // Admin user constructor
         public WeddingsViewModel(ApiClientService apiClient, NavigationService navigationService, UserDto targetUser)
+            : this(apiClient, navigationService, targetUser, GetBaseUrlFromApiClient(apiClient))
+        {
+        }
+
+        // Admin user constructor with base URL
+        public WeddingsViewModel(ApiClientService apiClient, NavigationService navigationService, UserDto targetUser, string baseApiUrl)
         {
             _apiClient = apiClient;
             _navigationService = navigationService;
             _targetUser = targetUser;
             _isAdminMode = true;
             _currentUserId = targetUser.UserID;
-            _guestUpdateService = new GuestUpdateService("https://localhost:7159");
-            _expenseUpdateService = new ExpenseUpdateService("https://localhost:7159");
-            _taskUpdateService = new TaskUpdateService("https://localhost:7159");
-            _weddingUpdateService = new WeddingUpdateService("https://localhost:7159");
+            _guestUpdateService = new GuestUpdateService(baseApiUrl);
+            _expenseUpdateService = new ExpenseUpdateService(baseApiUrl);
+            _taskUpdateService = new TaskUpdateService(baseApiUrl);
+            _weddingUpdateService = new WeddingUpdateService(baseApiUrl);
 
             ManageGuestsCommand = new RelayCommand(NavigateToGuests);
             ManageTasksCommand = new RelayCommand(NavigateToTasks);
@@ -103,6 +109,16 @@ namespace BandBaajaVivaah.WPF.ViewModel
 
             SubscribeToWeddingUpdates();
             LoadDataAsync();
+        }
+
+        // Helper method to get base URL from ApiClientService
+        private static string GetBaseUrlFromApiClient(ApiClientService apiClient)
+        {
+#if DEBUG
+            return "https://localhost:7159";
+#else
+            return "https://bandbaaja-api-2025.azurewebsites.net";
+#endif
         }
 
         // Initialize for regular users
