@@ -19,7 +19,7 @@ namespace BandBaajaVivaah.WPF
             string baseApiUrl = "https://localhost:7159";
 #else
             // For PRODUCTION, use your live Azure URL.
-            string baseApiUrl = "https://bandbaaja-api-2025.azurewebsites.net";
+            string baseApiUrl = "https://bandbaaja-api-live.azurewebsites.net";
 #endif
             var apiClient = new ApiClientService(baseApiUrl);
             var navigationService = new NavigationService();
