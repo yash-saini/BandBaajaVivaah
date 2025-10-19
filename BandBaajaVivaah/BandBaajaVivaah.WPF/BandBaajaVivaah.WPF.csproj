@@ -7,6 +7,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
 	  <ApplicationIcon>Resources\Images\favicon.ico</ApplicationIcon>
+	  <!-- Application Display Properties -->
+	  <AssemblyName>Band Baaja Vivaah</AssemblyName>
+	  <Product>Band Baaja Vivaah</Product>
+	  <AssemblyTitle>Band Baaja Vivaah</AssemblyTitle>
+	  <Description>Wedding Planning and Management Application</Description>
+	  <Company>Band Baaja Vivaah</Company>
+	  <Copyright>Copyright © 2025 Band Baaja Vivaah</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
