@@ -14,6 +14,7 @@ namespace BandBaajaVivaah.WPF
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+            var iconUri = new Uri("pack://application:,,,/Resources/Images/favicon.ico");
 #if DEBUG
             // For local development, use your localhost address.
             string baseApiUrl = "https://localhost:7159";
