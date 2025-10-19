@@ -7,10 +7,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
 	  <ApplicationIcon>Resources\Images\favicon.ico</ApplicationIcon>
-	  <ApplicationIcon>Resources\Images\trumpetFavicon.ico</ApplicationIcon>
-	  <ApplicationIcon>Resources\Images\ForgotPasswordFavicon.ico</ApplicationIcon>
-	  <ApplicationIcon>Resources\Images\RegisterFavicon.ico</ApplicationIcon>
-	  <ApplicationIcon>Resources\Images\ResetPasswordFavicon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
