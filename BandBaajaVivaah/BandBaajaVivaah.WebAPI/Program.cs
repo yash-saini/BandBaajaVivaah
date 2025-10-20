@@ -16,7 +16,7 @@ if (!builder.Environment.IsDevelopment())
         // Configure endpoint for HTTP/2
         options.ConfigureEndpointDefaults(listenOptions =>
         {
-            listenOptions.Protocols = HttpProtocols.Http2;
+            listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
         });
     });
 }
