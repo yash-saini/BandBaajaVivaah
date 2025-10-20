@@ -1,12 +1,25 @@
 using BandBaaajaVivaah.Data.Models;
 using BandBaaajaVivaah.Data.Repositories;
 using BandBaajaVivaah.Services;
-using Microsoft.EntityFrameworkCore;
-using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+if (!builder.Environment.IsDevelopment())
+{
+    builder.WebHost.ConfigureKestrel(options =>
+    {
+        // Configure endpoint for HTTP/2
+        options.ConfigureEndpointDefaults(listenOptions =>
+        {
+            listenOptions.Protocols = HttpProtocols.Http2;
+        });
+    });
+}
 
 // 1. Get the connection string from appsettings.json
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -74,7 +87,13 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 });
-builder.Services.AddGrpc();
+// Configure gRPC
+builder.Services.AddGrpc(options =>
+{
+    options.EnableDetailedErrors = true;
+    options.MaxReceiveMessageSize = null; // No limit
+    options.MaxSendMessageSize = null; // No limit
+});
 
 var app = builder.Build();
 
@@ -95,4 +114,5 @@ app.MapGrpcService<BandBaajaVivaah.Services.GrpcServices.GuestUpdateGrpcService>
 app.MapGrpcService<BandBaajaVivaah.Services.GrpcServices.ExpenseUpdateGrpcService>();
 app.MapGrpcService<BandBaajaVivaah.Services.GrpcServices.TaskUpdateGrpcService>();
 app.MapGrpcService<BandBaajaVivaah.Services.GrpcServices.WeddingUpdateGrpcService>();
+
 app.Run();
