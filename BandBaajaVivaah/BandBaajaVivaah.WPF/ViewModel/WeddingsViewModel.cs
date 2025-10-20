@@ -123,7 +123,7 @@ namespace BandBaajaVivaah.WPF.ViewModel
 #if DEBUG
             return "https://localhost:7159";
 #else
-            return "https://bandbaaja-api-2025.azurewebsites.net";
+            return "https://bandbaaja-api-live-d3gab3gpbrgzhkdm.canadacentral-01.azurewebsites.net";
 #endif
         }
 
