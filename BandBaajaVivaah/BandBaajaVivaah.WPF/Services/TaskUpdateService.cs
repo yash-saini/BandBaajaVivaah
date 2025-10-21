@@ -1,12 +1,13 @@
 ﻿using BandBaajaVivaah.Grpc;
 using Grpc.Core;
 using Grpc.Net.Client;
+using Grpc.Net.Client.Web;
+using System.Net.Http;
 
 namespace BandBaajaVivaah.WPF.Services
 {
     public class TaskUpdateService : IAsyncDisposable
     {
-        private readonly string _serverUrl;
         private GrpcChannel _channel;
         private Grpc.TaskUpdateService.TaskUpdateServiceClient _client;
         private CancellationTokenSource _cancellationTokenSource;
@@ -15,8 +16,12 @@ namespace BandBaajaVivaah.WPF.Services
 
         public TaskUpdateService(string serverUrl)
         {
-            _serverUrl = serverUrl;
-            _channel = GrpcChannel.ForAddress(_serverUrl);
+            var httpHandler = new GrpcWebHandler(GrpcWebMode.GrpcWebText, new HttpClientHandler());
+
+            _channel = GrpcChannel.ForAddress(serverUrl, new GrpcChannelOptions
+            {
+                HttpHandler = httpHandler
+            });
             _client = new Grpc.TaskUpdateService.TaskUpdateServiceClient(_channel);
             _cancellationTokenSource = new CancellationTokenSource();
         }

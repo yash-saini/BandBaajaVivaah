@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Grpc.AspNetCore.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -94,7 +95,6 @@ builder.Services.AddGrpc(options =>
     options.MaxReceiveMessageSize = null; // No limit
     options.MaxSendMessageSize = null; // No limit
 });
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -109,10 +109,12 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseGrpcWeb(new GrpcWebOptions { DefaultEnabled = true });
+
 app.MapControllers();
-app.MapGrpcService<BandBaajaVivaah.Services.GrpcServices.GuestUpdateGrpcService>();
-app.MapGrpcService<BandBaajaVivaah.Services.GrpcServices.ExpenseUpdateGrpcService>();
-app.MapGrpcService<BandBaajaVivaah.Services.GrpcServices.TaskUpdateGrpcService>();
-app.MapGrpcService<BandBaajaVivaah.Services.GrpcServices.WeddingUpdateGrpcService>();
+app.MapGrpcService<BandBaajaVivaah.Services.GrpcServices.GuestUpdateGrpcService>().EnableGrpcWeb();
+app.MapGrpcService<BandBaajaVivaah.Services.GrpcServices.ExpenseUpdateGrpcService>().EnableGrpcWeb();
+app.MapGrpcService<BandBaajaVivaah.Services.GrpcServices.TaskUpdateGrpcService>().EnableGrpcWeb();
+app.MapGrpcService<BandBaajaVivaah.Services.GrpcServices.WeddingUpdateGrpcService>().EnableGrpcWeb();
 
 app.Run();

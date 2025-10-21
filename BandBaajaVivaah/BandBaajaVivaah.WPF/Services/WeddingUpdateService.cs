@@ -1,26 +1,27 @@
 ﻿using BandBaajaVivaah.Grpc;
 using Grpc.Core;
 using Grpc.Net.Client;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
+using Grpc.Net.Client.Web;
+using System.Net.Http;
 
 namespace BandBaajaVivaah.WPF.Services
 {
     public class WeddingUpdateService : IAsyncDisposable
     {
-        private readonly string _serverUrl;
         private GrpcChannel _channel;
         private Grpc.WeddingUpdateService.WeddingUpdateServiceClient _client;
         private CancellationTokenSource _cancellationTokenSource;
-        private Task _subscriptionTask;
 
         public event EventHandler<WeddingUpdateEvent> OnWeddingUpdate;
 
         public WeddingUpdateService(string serverUrl)
         {
-            _serverUrl = serverUrl;
-            _channel = GrpcChannel.ForAddress(_serverUrl);
+            var httpHandler = new GrpcWebHandler(GrpcWebMode.GrpcWebText, new HttpClientHandler());
+
+            _channel = GrpcChannel.ForAddress(serverUrl, new GrpcChannelOptions
+            {
+                HttpHandler = httpHandler
+            });
             _client = new Grpc.WeddingUpdateService.WeddingUpdateServiceClient(_channel);
             _cancellationTokenSource = new CancellationTokenSource();
         }

@@ -1,6 +1,7 @@
 ﻿using BandBaajaVivaah.Grpc;
 using Grpc.Core;
 using Grpc.Net.Client;
+using Grpc.Net.Client.Web;
 using System.Net.Http;
 using System.Windows;
 using System.Windows.Threading;
@@ -17,7 +18,12 @@ namespace BandBaajaVivaah.WPF.Services
 
         public GuestUpdateService(string serverUrl)
         {
-            _channel = GrpcChannel.ForAddress(serverUrl);
+            var httpHandler = new GrpcWebHandler(GrpcWebMode.GrpcWebText, new HttpClientHandler());
+
+            _channel = GrpcChannel.ForAddress(serverUrl, new GrpcChannelOptions
+            {
+                HttpHandler = httpHandler
+            });
             _client = new Grpc.GuestUpdateService.GuestUpdateServiceClient(_channel);
             _cancellationTokenSource = new CancellationTokenSource();
         }
