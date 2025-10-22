@@ -114,6 +114,63 @@ Band Baaja Vivaah supports full wedding management with guests, tasks, and expen
       * **Edit:** Double-click a wedding row → opens the Add/Edit view → PUT to API.
       * **Delete:** Select a wedding → confirm → DELETE to API.
       * Proper data validations are in place with red marks for validation errors.
+      * Weddings list
+     <table>
+        <thead>
+          <tr>
+            <th align="center">Weddings List Page</th>
+            <th align="center">Adding a wedding</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <img width="997" height="562" alt="image" src="https://github.com/user-attachments/assets/515cba1c-5d96-4600-a122-c0492a99c60e" />
+            </td>
+            <td>
+              <img width="997" height="562" alt="image" src="https://github.com/user-attachments/assets/d588357b-160d-4131-89ce-f8290271e859" />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      
+    <table>
+        <thead>
+          <tr>
+            <th align="center">Validation error while saving</th>
+            <th align="center">Pressing delete after adding wedding and selecting it</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+             <td>
+              <img width="997" height="562" alt="image" src="https://github.com/user-attachments/assets/9508f02a-fffc-48a7-b1ad-190f120d65fa" />
+            </td>
+            <td>
+             <img width="997" height="562" alt="image" src="https://github.com/user-attachments/assets/8e630e18-46ad-41a5-a6ee-43f905aeeea6" />
+        </td>
+          </tr>
+        </tbody>
+      </table>
+
+    <table>
+        <thead>
+          <tr>
+            <th align="center">gRPC notification on delete</th>
+            <th align="center">Final state (additionally - night mode toggled on) </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+             <td>
+             <img width="997" height="561" alt="image" src="https://github.com/user-attachments/assets/22f984a8-7a22-4831-a34e-d5b76ca9bb2a" />
+            </td>
+            <td>
+             <img width="997" height="561" alt="image" src="https://github.com/user-attachments/assets/7522f70e-aa6b-4f43-8c34-d60851585553" />
+        </td>
+          </tr>
+        </tbody>
+      </table>
   * **Guests / Tasks / Expenses (Per Wedding):**
       * Open a wedding → navigate to the Guests, Tasks, or Expenses pages.
       * **Add:** Open the form → POST to the corresponding endpoint.
@@ -131,7 +188,7 @@ Band Baaja Vivaah supports full wedding management with guests, tasks, and expen
       * View and modify any user’s weddings and their related Guests, Tasks, and Expenses.
       * Create, update, or delete resources on behalf of other users.
   * **Admin Mode:** The WPF app supports an "admin view" where an admin can choose a target user and perform operations as that user.
-  * Logged in as an admin. Clicking on any icon under Actions will take the admin to weddings list page.
+  * Logged in as an admin. Clicking on any icon under Actions will take the admin to weddings list page for that corresponding user.
       <table>
         <thead>
           <tr>
