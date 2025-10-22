@@ -46,6 +46,68 @@ Band Baaja Vivaah supports full wedding management with guests, tasks, and expen
       * Use the login form to authenticate. On success, the client receives a JWT which is stored in `ApiClientService` and used for all subsequent REST calls.
       * Register creates a new account via the `AuthController`.
       * Forgot Password sends a reset token; Reset Password applies the new password.
+      * Login Screen
+      <table>
+        <thead>
+          <tr>
+            <th align="center">Before adding details:</th>
+            <th align="center">After adding details (hidden):</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <img width="400" height="400" alt="image" src="https://github.com/user-attachments/assets/dd15ff62-a93b-41f9-9231-162a2d18a1da" />
+            </td>
+            <td>
+              <img width="400" height="400" alt="image" src="https://github.com/user-attachments/assets/7a38deac-de45-4896-81fe-3121c8c6fd22" />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      * Register & Forgot Password Screen:-
+            <table>
+        <thead>
+          <tr>
+            <th align="center">Register:</th>
+            <th align="center">Forgot Password:</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <img  width="400" height="400" alt="image" src="https://github.com/user-attachments/assets/22aab3b5-6a5c-4d19-85cf-fb802055924b" />
+            </td>
+            <td>
+             <img width="400" height="400" alt="image" src="https://github.com/user-attachments/assets/0c85496d-0237-4f83-bcca-44920a6fd38b" />
+            </td>
+          </tr>
+        </tbody>
+        </table>
+
+     * Appropriate messages of success/failures are displayed as well.
+   
+     * Login Screens Admin and User:-
+            <table>
+        <thead>
+          <tr>
+            <th align="center">Admin Login:</th>
+            <th align="center">User Login:</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <img width="997" height="562" alt="image" src="https://github.com/user-attachments/assets/8ba62d9d-d3c4-442d-9ebd-6eeac8b46627" />
+            </td>
+            <td>
+             <img width="995" height="560" alt="image" src="https://github.com/user-attachments/assets/f58e9f09-4a45-4733-b2c3-0292e6053311" />
+            </td>
+          </tr>
+        </tbody>
+        </table>
+
+
   * **Weddings List:**
       * Displays all weddings associated with the authenticated user (or a target user (from admin portal) if in admin mode).
       * **Create:** Click "Add" → fill out the form → POST to API.
