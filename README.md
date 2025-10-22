@@ -131,7 +131,25 @@ Band Baaja Vivaah supports full wedding management with guests, tasks, and expen
       * View and modify any user’s weddings and their related Guests, Tasks, and Expenses.
       * Create, update, or delete resources on behalf of other users.
   * **Admin Mode:** The WPF app supports an "admin view" where an admin can choose a target user and perform operations as that user.
-
+  * Logged in as an admin. Clicking on any icon under Actions will take the admin to weddings list page.
+      <table>
+        <thead>
+          <tr>
+            <th align="center">User management page (on clicking admin portal):</th>
+            <th align="center">Role Change by admin (double clicking on a row):</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <img  width="997" height="562" alt="Screenshot 2025-10-21 211507" src="https://github.com/user-attachments/assets/99053719-1001-4bd1-922b-3ac8eae0ac81" />
+            </td>
+            <td>
+              <img width="997" height="562" alt="Screenshot 2025-10-21 211830_roleedit" src="https://github.com/user-attachments/assets/99debfcf-e705-41c7-aae4-0e7d0cb887c0" />
+            </td>
+          </tr>
+        </tbody>
+      </table>
 -----
 
 ## API & Server Architecture (Important Files)
