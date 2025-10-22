@@ -114,6 +114,8 @@ Band Baaja Vivaah supports full wedding management with guests, tasks, and expen
       * **Edit:** Double-click a wedding row → opens the Add/Edit view → PUT to API.
       * **Delete:** Select a wedding → confirm → DELETE to API.
       * Proper data validations are in place with red marks for validation errors.
+      * The 3 buttons under actions depict Manage Guests, Manage Tasks and Manage Expenses.
+      * <img width="150" height="150" alt="image" src="https://github.com/user-attachments/assets/626f5ee9-acf5-4cc4-9f1d-917fbbf661b8" />
       * Weddings list
      <table>
         <thead>
@@ -178,6 +180,62 @@ Band Baaja Vivaah supports full wedding management with guests, tasks, and expen
       * **Delete:** Select an item → confirm → DELETE.
       * Proper data validations are in place with red marks for validation errors.
       * The UI automatically refreshes the list after operations and also responds to real-time server notifications.
+          <table>
+        <thead>
+          <tr>
+            <th align="center">Guests List Page</th>
+            <th align="center">Add Guests Page</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <img width="997" height="561" alt="image" src="https://github.com/user-attachments/assets/298299e9-e70d-4942-bd2a-705e1d80372a" />
+            </td>
+            <td>
+              <img width="997" height="560" alt="image" src="https://github.com/user-attachments/assets/11635cde-c8db-4d8c-8bd0-b87f53cdb113" />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+       <table>
+        <thead>
+          <tr>
+            <th align="center">Tasks List Page</th>
+            <th align="center">Add Tasks Page</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <img width="997" height="560" alt="image" src="https://github.com/user-attachments/assets/bcd8f659-4014-401e-8466-1c64cb80da48" />
+            </td>
+            <td>
+              <img width="997" height="560" alt="image" src="https://github.com/user-attachments/assets/611fccd0-04f1-46ce-a9c1-c81ec04b85a9" />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+    <table>
+        <thead>
+          <tr>
+            <th align="center">Expenses List Page</th>
+            <th align="center">Add Expenses Page</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+             <img width="997" height="560" alt="image" src="https://github.com/user-attachments/assets/f9dda2dd-03a1-4ede-b693-f75f177599dd" />
+            </td>
+            <td>
+              <img width="997" height="560" alt="image" src="https://github.com/user-attachments/assets/0c069c42-e99f-4da7-9100-5d4a2182381b" />
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
 -----
 
