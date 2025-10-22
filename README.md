@@ -116,7 +116,7 @@ Band Baaja Vivaah supports full wedding management with guests, tasks, and expen
       * Proper data validations are in place with red marks for validation errors.
       * The 3 buttons under actions depict Manage Guests, Manage Tasks and Manage Expenses.
       * <img width="150" height="150" alt="image" src="https://github.com/user-attachments/assets/626f5ee9-acf5-4cc4-9f1d-917fbbf661b8" />
-      * Weddings list
+      * Weddings list screenshots:-
      <table>
         <thead>
           <tr>
@@ -180,6 +180,7 @@ Band Baaja Vivaah supports full wedding management with guests, tasks, and expen
       * **Delete:** Select an item → confirm → DELETE.
       * Proper data validations are in place with red marks for validation errors.
       * The UI automatically refreshes the list after operations and also responds to real-time server notifications.
+      * Guests, tasks and expenses screenshots added.
           <table>
         <thead>
           <tr>
