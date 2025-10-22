@@ -485,5 +485,4 @@ Repository: [https://github.com/yash-saini/BandBaajaVivaah](https://github.com/y
 -----
 
 ## License
-
-MIT — See LICENSE file in repository.
+ See LICENSE file in repository.
