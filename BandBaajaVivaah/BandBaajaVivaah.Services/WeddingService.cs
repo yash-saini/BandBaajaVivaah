@@ -59,30 +59,45 @@ namespace BandBaajaVivaah.Services
         public async Task<bool> DeleteWeddingAsync(int weddingId, int? ownerUserId)
         {
             var wedding = await _unitOfWork.Weddings.GetByIdAsync(weddingId);
-            if (wedding == null)
-            {
-                return false;
-            }
+            if (wedding == null) return false;
 
-            // If ownerUserId is provided (not admin), verify ownership
-            if (ownerUserId.HasValue && wedding.OwnerUserId != ownerUserId.Value)
-            {
-                return false;
-            }
+            if (ownerUserId.HasValue && wedding.OwnerUserId != ownerUserId.Value) return false;
 
-            // Store user ID and wedding details before deletion for notification
             var userId = wedding.OwnerUserId;
             var weddingDetails = CreateWeddingDetails(wedding);
 
-            await _unitOfWork.Weddings.DeleteAsync(weddingId);
-            await _unitOfWork.CompleteAsync();
+            try
+            {
+                // Delete children explicitly
+                var guests = await _unitOfWork.Guests.FindAllAsync(g => g.WeddingId == weddingId);
+                foreach (var g in guests) await _unitOfWork.Guests.DeleteAsync(g.GuestId);
 
-            // Notify subscribers about the deleted wedding
-            Console.WriteLine($"WeddingService: Notifying about Deleted wedding {weddingId} for user {userId}");
-            await WeddingUpdateGrpcService.NotifyWeddingChange(
-                userId,
-                WeddingUpdateEvent.Types.UpdateType.Deleted,
-                weddingDetails);
+                var tasks = await _unitOfWork.Tasks.FindAllAsync(t => t.WeddingId == weddingId);
+                foreach (var t in tasks) await _unitOfWork.Tasks.DeleteAsync(t.TaskId);
+
+                var expenses = await _unitOfWork.Expenses.FindAllAsync(e => e.WeddingId == weddingId);
+                foreach (var e in expenses) await _unitOfWork.Expenses.DeleteAsync(e.ExpenseId);
+
+                // Delete wedding and commit once
+                await _unitOfWork.Weddings.DeleteAsync(weddingId);
+                await _unitOfWork.CompleteAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"WeddingService: Error deleting wedding {weddingId}: {ex}");
+                return false;
+            }
+            try
+            {
+                await WeddingUpdateGrpcService.NotifyWeddingChange(
+                    userId,
+                    WeddingUpdateEvent.Types.UpdateType.Deleted,
+                    weddingDetails);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"WeddingService: Notification failed for deleted wedding {weddingId}: {ex}");
+            }
 
             return true;
         }
