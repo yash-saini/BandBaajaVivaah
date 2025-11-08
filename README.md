@@ -1,5 +1,7 @@
 # <img width="50" height="50" alt="BBVFavicon" src="https://github.com/user-attachments/assets/8a0cc63b-5a0e-44f0-9e3c-52fa2bd7e2dd" /> Band Baaja Vivaah
 
+##### Azure service is down
+
 ## Project Overview
 
 Band Baaja Vivaah is a wedding planning and management application built with:
